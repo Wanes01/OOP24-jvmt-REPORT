@@ -192,12 +192,13 @@ In particolare:
 \begin{itemize}
 	\item \textbf{Model}: definito dall'interfaccia \textit{Game}; rappresenta il punto di accesso
 	al dominio dell'applicazione.
-	\item \textbf{View}: viene definita dalle interfacce \textit{Window} e \textit{Page} che
-	rappresentano la finestra principale di visualizzazione e le singole pagine che possono
-	essere rappresentate su di essa.
+	\item \textbf{View}: viene definita dalle interfacce \textit{Window}, rappresentante la finestra
+	principale di visualizzazione, \textit{Page} rappresentante le singole pagine che possono
+	essere rappresentate su una Window e \textit{ControllerAwarePage}, specializzazione astratta di Page
+	che fornisce un meccanismo type-safe per legare una pagina al proprio controller.
 	\item \textbf{Controller}: definita da \textit{MainController}, il quale avvia l'applicazione,
 	\textit{PageController} che definisce l'interazione su una pagina specifica e
-	\textit{GameAwarePageController}, simile a PageController ma con accesso
+	\textit{GameAwarePageController}, specializzazione di PageController con accesso
 	ad informazioni sul model (Game). I controller per le pagine gestiscono la navigazione
 	tra queste ultime tramite \textit{PageNavigator}.
 \end{itemize}

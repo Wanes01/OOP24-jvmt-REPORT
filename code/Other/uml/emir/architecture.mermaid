@@ -12,6 +12,8 @@ direction TB
     }
     class GameAwarePageController {
     }
+    class ControllerAwarePage {
+    }
     class PageNavigator {
     }
     class Window {
@@ -20,13 +22,16 @@ direction TB
     }
     class Game {
     }
+
 	<<interface>> MainController
 	<<abstract>> PageController
 	<<abstract>> GameAwarePageController
+	<<abstract>> ControllerAwarePage
+	<<interface>> PageNavigator
 	<<interface>> Window
 	<<interface>> Page
-	<<interface>> PageNavigator
 	<<interface>> Game
+
     MainController -- Window : manages
     MainController -- PageNavigator : manages
     MainController -- Page : manages
@@ -35,5 +40,6 @@ direction TB
     PageController -- PageNavigator : navigates
     GameAwarePageController --|> PageController
     GameAwarePageController -- Game : uses
+    ControllerAwarePage --|> Page
     PageNavigator -- Page : registers
     Window -- Page : displays
