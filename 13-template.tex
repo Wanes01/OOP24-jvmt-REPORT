@@ -12,6 +12,10 @@
 
 \usepackage[italian]{cleveref}
 
+%---------------
+\newcommand{\imgpath}{img/png}
+%---------------
+
 %\title{Meta-relazione per\\``Programmazione ad Oggetti''}
 \title{Javamant \\ Relazione per il progetto del corso OOP}
 
@@ -235,6 +239,64 @@ Una versione schematizzata dell'architettura adoperata ~\ref{img:arch}:
 
 
 \section{Design dettagliato}
+
+%------
+-------------------------------------
+\subsubsection{Andrea La Tosa}
+\textbf{Refactoring classe DeckImpl:}
+
+\textbf{Problema:}
+
+Durante lo sviluppo del progetto la classe DeckImpl (responsabile della gestione del mazzo di carte) stava mostrando i seguenti problemi architetturali:
+\begin{itemize}
+	\item era diventata una classe molto grande con molti metodi, difficile da manutenere ed estendere,
+	\item  violava SRP(single responsibility principle),
+	\item  era diventata una vera e propria God class accentrando dentro di sè troppe responsabilità.
+\end{itemize}
+
+DeckImpl aveva una classe annidata che aveva lo scopo di:
+\begin{itemize}
+	\item  calcolare le statistiche del mazzo(es. il numero di carte trappola, il numero totale di carte nel mazzo etc..) restituendole alla classe contenitore che a sua volta le avrebbe restituite vergo l'esterno (logica poco intuitiva e ridondante)
+	\item  creare i vari tipi di mazzo (standard e special)
+	\item  Includere i metodi per aggiungere le carte al mazzo.
+\end{itemize}
+
+Questa implementazione risultava quindi confusionaria e difficilmente manutenibile.
+
+\textbf{Reafctoring effettuato:}
+
+Per risolvere queste problematiche è stato effettuato un refactoring strutturale che ha portato la divisione della classe originaria in classi piu' semplici e con responsabiltà singole e ben definite adottando due noti design pattern: Builder e Factory.
+il refactoring ha portato alla definizione delle seguenti classi:
+\begin{itemize}
+	\item  DeckImpl: gestisce la logica del mazzo come le statistiche, l'estrazione delle carte e il mescolamento
+	\item  DeckBuilderImpl: applica il pattern Builder per aggiungere al mazzo i vari tipi di carte e infine, medinate il metodo build(), creare un oggetto Deck.
+	\item  DeckFactory: applica il pattern Factory per la creazione di mazzi predefiniti (es. mazzo standard) sfruttando i metodi forniti da DeckBuilderImpl
+\end{itemize}
+
+\textbf{Benefici ottenuti dopo il refactoring:}
+
+\begin{itemize}
+	\item  manutenibilità: ogni classe ha una responsabilità piu' piccola e ben definita.
+	\item  estendibilità: è molto piu' semplice aggiungere nuove funzionalità e configurazioni di mazzi.
+	\item  testing: i test sono piu' semplici da effettuare non avendo piu' una God class.
+\end{itemize}
+
+Riassumendo queste modifiche hanno reso il codice decisamente piu' manutenibile, estendibile e riusabile ma hanno introdotto anche alcune problematiche come:
+\begin{itemize}
+	\item  piu' interfacce e classi da gestire
+	\item  la comprensione del codice potrebbe risultare inizialmente piu' complessa.
+\end{itemize}
+
+
+%AGGIUNGERE IMMAGINE UML DECK
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.8\textwidth]{\imgpath/UML_Deck.png}
+	\caption{Diagramma UML}
+	\label{fig:uml}
+\end{figure}
+-----------------------------------------------
+%------
 
 In questa sezione si possono approfondire alcuni elementi del design con maggior dettaglio.
 %
