@@ -1,0 +1,39 @@
+---
+config:
+  layout: elk
+  class:
+    hideEmptyMembersBox: true
+---
+classDiagram
+direction TB
+    class MainController {
+    }
+    class PageController {
+    }
+    class GameAwarePageController {
+    }
+    class PageNavigator {
+    }
+    class Window {
+    }
+    class Page {
+    }
+    class Game {
+    }
+	<<interface>> MainController
+	<<abstract>> PageController
+	<<abstract>> GameAwarePageController
+	<<interface>> Window
+	<<interface>> Page
+	<<interface>> PageNavigator
+	<<interface>> Game
+    MainController -- Window : manages
+    MainController -- PageNavigator : manages
+    MainController -- Page : manages
+    MainController -- PageController : manages
+    PageController -- Page : controls
+    PageController -- PageNavigator : navigates
+    GameAwarePageController --|> PageController
+    GameAwarePageController -- Game : uses
+    PageNavigator -- Page : registers
+    Window -- Page : displays

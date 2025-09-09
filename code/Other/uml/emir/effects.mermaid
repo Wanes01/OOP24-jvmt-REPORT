@@ -1,0 +1,49 @@
+---
+config:
+  layout: elk
+  class:
+    hideEmptyMembersBox: true
+---
+classDiagram
+direction BT
+    class Round {
+    }
+    class RoundState {
+    }
+    class RoundEffect {
+	    +isEndConditionMet(state: RoundState) boolean
+	    +applyGemModifier(state: RoundState, gems: int) int
+    }
+    class GemModifierFactory {
+    }
+    class EndConditionFactory {
+    }
+    class RoundEffectImpl {
+    }
+    class RoundImpl {
+    }
+    class EndCondition {
+	    +isEndConditionMet(state: RoundState) boolean
+    }
+    class GemModifier {
+	    +applyGemModifier(state: RoundState, gems: int) int
+    }
+
+	<<interface>> Round
+	<<interface>> RoundState
+	<<interface>> RoundEffect
+	<<interface>> GemModifierFactory
+	<<interface>> EndConditionFactory
+	<<interface>> EndCondition
+	<<interface>> GemModifier
+
+    GemModifier ..> RoundState : uses
+    EndCondition ..> RoundState : uses
+    GemModifierFactory ..> GemModifier : creates
+    RoundEffectImpl ..|> RoundEffect
+    RoundEffectImpl *-- EndCondition
+    RoundEffectImpl *-- GemModifier
+    RoundImpl ..|> Round
+    RoundState --* RoundImpl
+    RoundEffect --* RoundImpl
+    EndConditionFactory ..> EndCondition : creates
