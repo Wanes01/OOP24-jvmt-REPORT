@@ -22,6 +22,7 @@ direction TB
     }
     class Page {
     }
+
 	<<interface>> MainController
 	<<abstract>> PageController
 	<<abstract>> GameAwarePageController
@@ -30,14 +31,19 @@ direction TB
 	<<interface>> Window
 	<<interface>> Game
 	<<interface>> Page
-    MainController -- Window : manages
-    MainController -- PageNavigator : manages
-    MainController -- Page : manages
-    MainController -- PageController : manages
-    PageController -- PageNavigator : navigates
+
+    MainController --> Window : manages
+    MainController --> PageNavigator : manages
+    MainController --> Page : manages
+    MainController --> PageController : manages
+    PageController o-- PageNavigator : </br>
     GameAwarePageController --|> PageController
-    GameAwarePageController -- Game : uses
+    GameAwarePageController o-- Game : <br>
     ControllerAwarePage --|> Page
-    PageNavigator -- Page : registers
-    Window -- Page : displays
-    PageController -- ControllerAwarePage : controls
+    PageNavigator --> Page : registers
+    Window --> Page : displays
+    PageController o-- ControllerAwarePage : <br>
+
+
+
+(MANCA UNA AGGREGAZIONE! Falla su PhotoShop perchè mermaid la sminchia)

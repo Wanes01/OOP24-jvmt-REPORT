@@ -17,16 +17,17 @@ direction BT
     }
     class PageNavigatorImpl {
     }
+    class PageController {
+    }
     class Window {
 	    +setCurrentPage(page: Page)
-    }
-    class PageController {
     }
 
 	<<interface>> PageNavigator
 	<<enumeration>> PageId
 	<<interface>> Page
 	<<abstract>> PageController
+	<<interface>> Window
 
     PageNavigator ..> PageId
     PageNavigator ..> "*" Page : navigates
