@@ -41,9 +41,9 @@ direction BT
     EndCondition ..> RoundState : uses
     GemModifierFactory ..> GemModifier : creates
     RoundEffectImpl ..|> RoundEffect
-    RoundEffectImpl *-- EndCondition
-    RoundEffectImpl *-- GemModifier
+    RoundEffectImpl o-- EndCondition
+    RoundEffectImpl o-- GemModifier
     RoundImpl ..|> Round
     RoundState --* RoundImpl
-    RoundEffect --* RoundImpl
+    RoundEffect --o RoundImpl
     EndConditionFactory ..> EndCondition : creates

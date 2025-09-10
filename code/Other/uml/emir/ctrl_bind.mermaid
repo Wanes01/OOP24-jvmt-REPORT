@@ -13,27 +13,33 @@ direction BT
     }
     class SwingPage {
     }
-    class SwingHomePage {
-    }
-    class SwingSettingsPage {
-    }
-    class SwingGameplayPage {
-    }
-    class SwingLeaderboardPage {
-    }
     class PageController {
     }
     class Page {
     }
+    class SwingHomePage {
+	    +setHandlers()
+    }
+    class SwingSettingsPage {
+	    +setHandlers()
+    }
+    class SwingGameplayPage {
+	    +setHandlers()
+    }
+    class SwingLeaderboardPage {
+	    +setHandlers()
+    }
+
 	<<abstract>> ControllerAwarePage
 	<<abstract>> SwingPage
 	<<abstract>> PageController
 	<<interface>> Page
+
     ControllerAwarePage --|> Page
     SwingPage --|> ControllerAwarePage
     SwingHomePage ..|> SwingPage
     SwingSettingsPage ..|> SwingPage
     SwingGameplayPage ..|> SwingPage
     SwingLeaderboardPage ..|> SwingPage
-    PageController --* ControllerAwarePage
-    ControllerAwarePage --* PageController
+    PageController --o ControllerAwarePage
+    ControllerAwarePage --o PageController

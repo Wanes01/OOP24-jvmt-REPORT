@@ -260,8 +260,8 @@ Entrambi vengono creati tramite \textit{Factory Method} e accoppiati in un
 \begin{figure}[H]   % H maiuscola
 \centering
 \includegraphics[width=\textwidth]{img/effects}
-\caption{Il diagramma mostra il pattern Strategy applicato a EndCondition e GemModifier, creati
-dalle rispettive Factory Method e composti in RoundEffectImpl. RoundImpl può utilizzare
+\caption{Il diagramma mostra come EndCondition e GemModifier rappresentino le stategie, creati
+dalle rispettive factory e composti in RoundEffectImpl. RoundImpl può utilizzare
 le due strategie in modo completamente interscambiabile.}
 \label{img:effects}
 \end{figure}
@@ -280,18 +280,20 @@ problema è l'utilizzo del pattern Decorator, il quale non viene utilizzato.
 
 \subsection*{Iterazione solo sui giocatori in esplorazione}
 \begin{description}
-	\item[\textbf{Problema}]: durante un round i giocatori possono uscire.
+	\item[\textbf{Problema}]: durante un round i giocatori possono decidere di uscire.
 	Serve un modo per poter passare al prossimo giocatore attivo, saltando
 	quelli che hanno abbandonato l'esplorazione della grotta.
 
 	\item[\textbf{Soluzione}]: Uso del pattern \textit{Iterator} da parte
 	dell'interfaccia \texttt{RoundPlayerManager} che estende \texttt{Iterator<Player>}
-	per ottenere con una sola chiamata il prossimo giocatore attivo ~\ref{img:playermanager}.
+	per ottenere con una sola chiamata il giocatore del prossimo turno ~\ref{img:playermanager}.
 
 	\begin{figure}[H]   % H maiuscola
 	\centering
 	\includegraphics[width=0.4\textwidth]{img/playermanager}
-	\caption{Il diagramma mostra il pattern Iterator applicato a RoundPlayerManager.}
+	\caption{Il diagramma mostra come RoundPlayerManager sia un iteratore di Player,
+	permettendo di ottenere il prossimo giocatore attivo e capire se ci sono
+	ancora giocatori in esplorazione.}
 	\label{img:playermanager}
 	\end{figure}
 
@@ -310,13 +312,15 @@ problema è l'utilizzo del pattern Decorator, il quale non viene utilizzato.
 	necessita di interagibilità ha bisogno che venga associata ad uno specifico \texttt{PageController}; 
 	gli handler degli eventi relativi ai componenti grafici delle pagine variano per ognuna di esse
 	e devono essere inizializzati solo quando lo specifico PageController viene assegnato alla pagina.
+	Serve un modo per impostare gli handler dei componenti grafici non appena viene scelto quale
+	PageController utilizzare sulla pagina.
 
 	\item[\textbf{Soluzione}]: tramite l'applicazione del pattern \textit{Template Method} la specializzazione 
 	astratta di Page che modella pagine interagibili, \texttt{ControllerAwarePage}, richiama il metodo astratto \texttt{setHandlers()}
 	nel momento in cui nella Page viene associato il proprio controller effettuando una chiamata al metodo
 	\texttt{setController(PageController)}.
 	In questo caso il metodo \texttt{setController(PageController)} costituisce il template method: esso associa
-	il controller ed imposta gli handler della visualizzazione senza preoccuparsi di come le pagine specifiche (le sue sottoclassi)
+	il controller ed imposta gli handler della visualizzazione senza preoccuparsi di come le pagine \texttt{ControllerAwarePage}
 	inizializzino questi ultimi. ~\ref{img:ctrl_bind}.
 
 	\begin{figure}[H]   % H maiuscola
@@ -325,7 +329,8 @@ problema è l'utilizzo del pattern Decorator, il quale non viene utilizzato.
 	\caption{Il diagramma mostra il pattern Template Method applicato a ControllerAwarePage, in cui
 	il metodo \texttt{setController(PageController)} fa da metodo template e \texttt{setHandlers()} da hook.
 	Nota: il metodo getController(class) viene utilizzato per evitare la propagazione dei generici a tutto
-	l'albero strutturale.}
+	l'albero strutturale: esso è un metodo utilizzabile dalle ControllerAwarePage che effettua un
+	cast sicuro alle specializzazioni di PageController.}
 	\label{img:ctrl_bind}
 	\end{figure}
 
@@ -336,12 +341,50 @@ problema è l'utilizzo del pattern Decorator, il quale non viene utilizzato.
 	pagina interagibile basta implementare \texttt{setHandlers()}.
 
 	\item[\textbf{Contro}]: con Template Method la struttura diventa rigida: se si volesse cambiare
-	un comportamento di \texttt{ControllerAwarePage} comporterebbe probabilmente duplicazione di codice.
-	un altra problematica è il fatto che una pagina interagibile deve forzatamente estendere
+	un comportamento di \texttt{ControllerAwarePage} comporterebbe probabile duplicazione di codice.
+	Un'altra problematica è il fatto che una pagina interagibile deve forzatamente estendere
 	\texttt{ControllerAwarePage}, bloccando la possibilità di estendere da altre classi 
 	(ad esempio, SwingPage avrebbe potuto estendere direttamente JPanel).
 \end{description}
 
+\subsection*{Centralizzazione della navigazione tra pagine}
+\begin{description}
+	\item[\textbf{Problema}]: essendo la natura dell'applicazione interattiva e multipagina,
+	occorre un modo per poter passare da una visualizzazione all'altra senza che un \texttt{PageController}
+	mantenga riferimenti a pagine su cui non deve gestire l'interazione (un PageController deve
+	gestire una ed una sola pagina).
+
+	\item[\textbf{Soluzione}]: si centralizza la logica di navigazione tra \texttt{Page}
+	all'interno di un navigatore: \texttt{PageNavigator}. Il navigatore si occupa di registrare
+	le pagine associandole ad una chiave (in questo caso l'enumerazione \texttt{PageId})
+	e cambiare la visualizzazione tramite quest'ultima. In questo modo PageController
+	non dovrà preoccuparsi di mantenere riferimenti a pagine su cui non deve gestire l'interazione. ~\ref{img:navigator}
+	Questo approccio non utilizza alcun design pattern.
+	\footnote{Questo approccio non rappresenta alcun OOP design pattern ma è un pattern architetturale
+	molto utilizzato in ambito mobile e web per la navigazione multipagina.}
+
+	\begin{figure}[H]   % H maiuscola
+	\centering
+	\includegraphics[width=0.5\textwidth]{img/navigator}
+	\caption{Il diagramma mostra come PageController gestisca una singola pagina
+	e come PageNavigator coordini la navigazione verso altre pagine.}
+	\label{img:navigator}
+	\end{figure}
+
+	\item[\textbf{Pro}]: tutta la logica del passaggio da una pagina all'altra
+	viene centralizzata in \texttt{PageNavigator}, riducendo la duplicazione di codice
+	e favorendo il riutilizzo. PageController non necessita di alcuna informazione
+	sulle altre pagine: gli basta conoscere la chiave associata. Si possono aggiungere
+	nuove pagine navigabili in modo facile: basta registrare una coppia
+	\texttt{(PageId, Page)}.
+
+	\item[\textbf{Contro}]: l'utilizzo di \texttt{PageId} come chiave
+	per navigare tra le pagine rende impossibile l'aggiunta di pagine create
+	in modo dinamico poichè PageId presenta un numero finito di chiavi associabili
+	(ad esempio, in futuro si potrebbe voler aggiungere pagine senza
+	struttura statica, create sul momento in base allo stato della partita).
+	
+\end{description}
 
 
 \chapter{Sviluppo}
