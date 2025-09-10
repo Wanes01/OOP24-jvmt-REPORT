@@ -1,0 +1,28 @@
+---
+config:
+  layout: elk
+  class:
+    hideEmptyMembersBox: true
+---
+classDiagram
+direction BT
+    class Iterator~Player~ {
+	    +hasNext() boolean
+	    +next() Player
+    }
+    class RoundPlayerManagerImpl {
+    }
+    class Player {
+    }
+    class RoundPlayerManager {
+	    +getActivePlayers() List~Player~
+	    +getExitedPlayers() List~Player~
+    }
+
+	<<interface>> Iterator
+	<<interface>> Player
+	<<interface>> RoundPlayerManager
+
+    RoundPlayerManager --|> Iterator
+    RoundPlayerManagerImpl ..|> RoundPlayerManager
+    Iterator~Player~ ..> Player : uses

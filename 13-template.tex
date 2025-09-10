@@ -194,8 +194,8 @@ In particolare:
 	al dominio dell'applicazione.
 	\item \textbf{View}: viene definita dalle interfacce \textit{Window}, rappresentante la finestra
 	principale di visualizzazione, \textit{Page} rappresentante le singole pagine che possono
-	essere rappresentate su una Window e \textit{ControllerAwarePage}, specializzazione astratta di Page
-	che fornisce un meccanismo type-safe per legare una pagina al proprio controller.
+	essere rappresentate su una Window e \textit{ControllerAwarePage}, specializzazione astratta di Page,
+	rappresenta una pagina interagibile (che adotta un controller).
 	\item \textbf{Controller}: definita da \textit{MainController}, il quale avvia l'applicazione,
 	\textit{PageController} che definisce l'interazione su una pagina specifica e
 	\textit{GameAwarePageController}, specializzazione di PageController con accesso
@@ -210,7 +210,7 @@ Le interazioni principali di questa architettura sono:
 	il PageNavigator, le varie Page e rispettivi PageController.
 	\item GameAwarePageController estende PageController; interagisce con
 	Game per recuperare informazioni sullo stato della partita.
-	\item Ogni PageController è associato a un'unica Page e
+	\item Ogni PageController è associato a un'unica ControllerAwarePage (pagina interagibile) e
 	utilizza il PageNavigator per cambiare visualizzazione.
 	\item Window ha il compito di essere un contenitore per Page e si
 	occupa di mostrarle all'utente.
@@ -229,7 +229,7 @@ Una versione schematizzata dell'architettura adoperata ~\ref{img:arch}:
 
 \begin{figure}[H]   % H maiuscola
 \centering
-\includegraphics[width=\textwidth]{img/architecture}
+\includegraphics[width=0.7\textwidth]{img/architecture}
 \caption{Schema UML architetturale di Javamant.}
 \label{img:arch}
 \end{figure}
@@ -256,7 +256,6 @@ Viene utilizzato il pattern \textit{Strategy} per incapsulare, in modo modulare
 \end{itemize}
 Entrambi vengono creati tramite \textit{Factory Method} e accoppiati in un
 \texttt{RoundEffect}, usato dal Round senza conoscere i dettagli di come esso agisce ~\ref{img:effects}.
-\end{description}
 
 \begin{figure}[H]   % H maiuscola
 \centering
@@ -267,7 +266,6 @@ le due strategie in modo completamente interscambiabile.}
 \label{img:effects}
 \end{figure}
 
-\begin{description}
 \item[\textbf{Pro}]:
 l'utilizzo del pattern Strategy permette una facile interscambiabilità tra
 diversi tipi di approcci alla fine del round e alla modifica delle gemme, senza che avvenga alcuna
@@ -279,6 +277,72 @@ condizioni di fine vere per terminare il round), occorrerebbe introdurre nuove s
 composte, come classi singole o metodi nella factory. Una possibile soluzione a questo
 problema è l'utilizzo del pattern Decorator, il quale non viene utilizzato. 
 \end{description}
+
+\subsection*{Iterazione solo sui giocatori in esplorazione}
+\begin{description}
+	\item[\textbf{Problema}]: durante un round i giocatori possono uscire.
+	Serve un modo per poter passare al prossimo giocatore attivo, saltando
+	quelli che hanno abbandonato l'esplorazione della grotta.
+
+	\item[\textbf{Soluzione}]: Uso del pattern \textit{Iterator} da parte
+	dell'interfaccia \texttt{RoundPlayerManager} che estende \texttt{Iterator<Player>}
+	per ottenere con una sola chiamata il prossimo giocatore attivo ~\ref{img:playermanager}.
+
+	\begin{figure}[H]   % H maiuscola
+	\centering
+	\includegraphics[width=0.4\textwidth]{img/playermanager}
+	\caption{Il diagramma mostra il pattern Iterator applicato a RoundPlayerManager.}
+	\label{img:playermanager}
+	\end{figure}
+
+	\item[\textbf{Pro}]: l'utilizzatore di RoundPlayerManager non deve preoccuparsi della
+	logica con cui il prossimo giocatore della partita viene scelto, questo
+	garantisce flessibilità e rimuove la responsabilità di scegliere il prossimo
+	giocatore dal round.
+
+	\item[\textbf{Contro}]: una volta che l'Iterator viene consumato non è più
+	riutilizzabile ed è necessario crearne un altro. 
+\end{description}
+
+\subsection*{Lazy binding del controller nella view}
+\begin{description}
+	\item[\textbf{Problema}]: per via dell'architettura scelta, ogni \texttt{Page} che
+	necessita di interagibilità ha bisogno che venga associata ad uno specifico \texttt{PageController}; 
+	gli handler degli eventi relativi ai componenti grafici delle pagine variano per ognuna di esse
+	e devono essere inizializzati solo quando lo specifico PageController viene assegnato alla pagina.
+
+	\item[\textbf{Soluzione}]: tramite l'applicazione del pattern \textit{Template Method} la specializzazione 
+	astratta di Page che modella pagine interagibili, \texttt{ControllerAwarePage}, richiama il metodo astratto \texttt{setHandlers()}
+	nel momento in cui nella Page viene associato il proprio controller effettuando una chiamata al metodo
+	\texttt{setController(PageController)}.
+	In questo caso il metodo \texttt{setController(PageController)} costituisce il template method: esso associa
+	il controller ed imposta gli handler della visualizzazione senza preoccuparsi di come le pagine specifiche (le sue sottoclassi)
+	inizializzino questi ultimi. ~\ref{img:ctrl_bind}.
+
+	\begin{figure}[H]   % H maiuscola
+	\centering
+	\includegraphics[width=0.85\textwidth]{img/ctrl_bind}
+	\caption{Il diagramma mostra il pattern Template Method applicato a ControllerAwarePage, in cui
+	il metodo \texttt{setController(PageController)} fa da metodo template e \texttt{setHandlers()} da hook.
+	Nota: il metodo getController(class) viene utilizzato per evitare la propagazione dei generici a tutto
+	l'albero strutturale.}
+	\label{img:ctrl_bind}
+	\end{figure}
+
+	\item[\textbf{Pro}]: c'è una separazione netta delle responsabilità: la logica comune
+	(l'impostazione del controller) viene centralizzata in \texttt{ControllerAwarePage} mentre le sue estensioni
+	si occupano solo di specificare quali eventi devono essere associati al controller. Questo
+	comporta anche una riduzione del codice duplicato; estendibilità semplice: per aggiungere una nuova
+	pagina interagibile basta implementare \texttt{setHandlers()}.
+
+	\item[\textbf{Contro}]: con Template Method la struttura diventa rigida: se si volesse cambiare
+	un comportamento di \texttt{ControllerAwarePage} comporterebbe probabilmente duplicazione di codice.
+	un altra problematica è il fatto che una pagina interagibile deve forzatamente estendere
+	\texttt{ControllerAwarePage}, bloccando la possibilità di estendere da altre classi 
+	(ad esempio, SwingPage avrebbe potuto estendere direttamente JPanel).
+\end{description}
+
+
 
 \chapter{Sviluppo}
 \section{Testing automatizzato}
