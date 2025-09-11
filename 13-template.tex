@@ -339,7 +339,6 @@ problema è l'utilizzo del pattern Decorator, il quale non viene utilizzato.
 	in modo dinamico poichè PageId presenta un numero finito di chiavi associabili
 	(ad esempio, in futuro si potrebbe voler aggiungere pagine senza
 	struttura statica, create sul momento in base allo stato della partita).
-	
 \end{description}
 
 
@@ -349,11 +348,67 @@ problema è l'utilizzo del pattern Decorator, il quale non viene utilizzato.
 
 
 \section{Note di sviluppo}
+\subsection{Emir Wanes Aouioua}
+\subsubsection*{Progettazione con generici}
+Utilizzati in vari punti, sia per design di classe che su singoli metodi:
+\url{https://github.com/Wanes01/OOP24-jvmt/blob/ccdbae592c490476d3226350cbdbbeb99e32a596/src/test/java/jvmt/navigator/PageNavigatorImplTest.java#L99C1-L101C64}
 
+\subsubsection*{Uso di lamda expressions}
+Utilizzate molto spesso:
+\url{https://github.com/Wanes01/OOP24-jvmt/blame/ccdbae592c490476d3226350cbdbbeb99e32a596/src/main/java/jvmt/model/round/impl/roundeffect/gemmodifier/GemModifierFactoryImpl.java#L43}
 
+\subsubsection*{Uso di \texttt{Stream}}
+Utilizzati molto spesso:
+\url{https://github.com/Wanes01/OOP24-jvmt/blob/ccdbae592c490476d3226350cbdbbeb99e32a596/src/main/java/jvmt/model/round/impl/roundeffect/endcondition/EndConditionFactoryImpl.java#L79C1-L80C52}
 
+\subsubsection*{Uso di \texttt{Optional}}
+Utilizzati frequentemente per evitare \texttt{null}:
+\url{https://github.com/Wanes01/OOP24-jvmt/blame/ccdbae592c490476d3226350cbdbbeb99e32a596/src/main/java/jvmt/model/round/impl/turn/TurnImpl.java#L60}
+
+\subsubsection*{Uso di interfacce funzionali}
+Utilizzate frequentemente:
+\url{https://github.com/Wanes01/OOP24-jvmt/blob/ccdbae592c490476d3226350cbdbbeb99e32a596/src/main/java/jvmt/model/round/impl/RoundStateImpl.java#L88C1-L89C44}
+
+\subsection*{Codice di terze parti}
+\begin{itemize}
+	\item ho effettuato un adattamento dello snipper di \textit{Joel Carranza} come risposta
+	alla sequente domanda su StackOverflow. \footnote{Joel Carranza, font scalabile a prescindere dal DPI: \url{https://stackoverflow.com/questions/1102216/can-i-set-the-dpi-resolution-of-my-java-swing-application-without-changing-the-s}}
+	L'adattamento viene utilizzato nella classe \texttt{SwingWindow} per adattare la dimensione del font
+	per tutte le pagine Swing in base al DPI dello schermo utilizzato. 
+	
+\end{itemize}
 \chapter{Commenti finali}
 
+\section{Autovalutazione e lavori futuri}
+\subsection{Emir Wanes Aouioua}
+Nel complesso, sono soddisfatto del lavoro svolto nel progetto. Dopo la fase iniziale di analisi
+del dominio assieme ai miei colleghi, mi sono occupato in modo particolare della parte di model
+e della definizione dello scheletro architetturale. Questo mi ha portato ad assumere un ruolo
+piuttosto centrale nelle scelte progettuali, che spesso è risultato anche più
+impegnativo di quanto avessi previsto.
+Ammetto che la divisione del carico di lavoro non sia stata ben bilanciata, ma considero
+questo un aspetto naturale ed inevitabile in un primo progetto di sviluppo cooperativo, e nonostante
+senta di aver avuto un maggior numero di responsabilità
+penso che ciascuno di noi abbia messo a disposizione al meglio le proprie competenze
+contribuendo al progetto. Sono contento della coesione e disponibilità reciproca che si è mantenuta
+all'interno del gruppo dall'inizio alla fine.
+Col senno di poi, alcune scelte architetturali che ho fatto potrebbero essere migliorate:
+ad esempio rivedrei il modo in cui pagine e relativi controller vengono associati.
+Nel complesso però sono fiero della struttura che ho realizzato.
+Non credo che porterei avanti il progetto nel suo complesso, ma trovo che
+l'architettura possa avere del potenziale: mi piacerebbe rifinirla per utilizzarla
+in altre applicazioni personali.
+
+\section{Difficoltà incontrate e commenti per i docenti}
+\subsection{Emir Wanes Aouioua}
+Sono soddisfatto di come sia stato strutturato il corso di OOP ma presento una piccola critica
+legata ad una mia passata difficoltà: al giorno d'oggi sono fiero di poter dire di aver
+capito i design pattern che sono stati presentati a lezione e, dopo tanto allenamento personale,
+non saprei più come lavorare senza (soprattuto strategy, che ritengo uno dei più versatili);
+detto ciò, però, penso che durante il corso si dia davvero poco tempo a disposizione ad un
+argomento cosí importante e su cui verte cosí tanto la valutazione tra progetto ed esame pratico
+in laboratorio. Personalmente concederei almeno una lezione teorica ed una pratica
+aggiuntive al fine di far comprendere meglio gli OOP design pattern.
 \appendix
 \chapter{Guida utente}
 
