@@ -347,7 +347,7 @@ Utilizzati in vari punti. Un esempio è \url{https://github.com/Wanes01/OOP24-jv
 
 \subsection{Filippo Gaggi}
 
-Ho dato del mio meglio per fare la mia parte in questo progetto. Nonostante non abbia utilizzato molte tecniche avanzate di Java, ritengo di aver scritto codice pulito e ben comprensibile.
+Nonostante non abbia utilizzato molte tecniche avanzate di Java, ritengo di aver scritto codice pulito e ben comprensibile.
 Vado molto fiero della logica delle CPU, la quale ha preso una moderata quantità tempo per farla comportare come desideravo.
 Seppur non abbia brillato molto nella parte di model, mi sono impegnato quanto più potevo nei controller e nelle corrispettive pagine (Gameplay e Leaderboard), portando un risultato che reputo più che apprezzabile sia dal lato grafico che dal lato del codice.
 Ritengo tutto sommato che il mio contributo per il gruppo sia stato importante anche se un po' grezzo e non troppo brillante.
@@ -361,14 +361,14 @@ Ritengo tutto sommato che il mio contributo per il gruppo sia stato importante a
 \centering{}
 \includegraphics[width=\textwidth]{img/Home_Page.png}
 \caption{Scermata Home di Javamant.}
-\label{img:strategy}
+\label{img:Home_Page}
 \end{figure}
 
 \section{Impostazioni}
 
 Nella pagina delle impostazioni è possibile selezionare le impostazioni desiderate, tra le quali:
 \begin{itemize}
-	\item nomi dei giocatori (un nome corrisponde ad un player "reale")
+	\item nomi dei giocatori (un nome corrisponde ad un giocatore reale)
 	\item numero delle CPU
 	\item difficoltà delle CPU
 	\item tipo di deck
@@ -376,33 +376,50 @@ Nella pagina delle impostazioni è possibile selezionare le impostazioni desider
 	\item modificatori delle gemme
 	\item numero di round
 \end{itemize}
+Una volta settate le impostazioni si può inizare la partita premendo il pulsante "START GAME".
 
 \begin{figure}[H]
 \centering{}
 \includegraphics[width=\textwidth]{img/Settings_Page.png}
 \caption{Scermata delle impostazioni di Javamant.}
-\label{img:strategy}
+\label{img:Settings_Page}
+\end{figure}
+
+\section{Impostazioni non corrette}
+
+Se per caso non vengono rispettati i requisiti delle impostazioni, quali:
+\begin{itemize}
+	\item nomi dei giocatori che superano i 12 caratteri.
+	\item numero dei giocatori inferiori a 3 o superiori a 8.
+\end{itemize}
+Apparirà un pop up che informa riguardo i settaggi non corretti.
+
+\begin{figure}[H]
+\centering{}
+\includegraphics[width=\textwidth]{img/Error_Settings.png}
+\caption{Pop up che informa sui settaggi sbagliati delle impostazioni di gioco.}
+\label{img:Error_Settings}
 \end{figure}
 
 \section{Gameplay}
 
 \subsubsection{Fase di pesca}
 
-Se il giocatore attuale è reale sarà possibile premerlo per pescare una carta dal mazzo.
-\\Se il giocatore attuale è una CPU il pulsante per pescare verrà disabilitato e la pesca verrà eseguita automaticamente.
+Se è il turno di un giocatore reale sarà possibile premere il pulsante "DRAW" per pescare una carta dal mazzo.
+\\Se è il turno di una CPU il pulsante per pescare verrà disabilitato e la pesca verrà eseguita automaticamente.
 
 \begin{figure}[H]
 \centering{}
 \includegraphics[width=\textwidth]{img/Enabled_Button_Player.png}
-\caption{Scermata del gioco con un giocatore reale come giocatore attuale.}
-\label{img:strategy}
+\caption{Scermata del gioco nel turno di un giocatore reale.}
+\label{img:Enabled_Button_Player}
 \end{figure}
 
 \begin{figure}[H]
 \centering{}
 \includegraphics[width=\textwidth]{img/Disabled_Button_CPU.png}
-\caption{Scermata del gioco con una CPU come giocatore attuale.}
-\label{img:strategy}
+\caption{Scermata del gioco nel turno di una CPU.}
+\label{img:Disabled_Button_CPU}
 \end{figure}
 
 \subsubsection{Fase di decisione}
@@ -413,7 +430,7 @@ Dopo la fase di pesca ciascun giocatore dovrà scegliere se rimanere in gioco op
 \centering{}
 \includegraphics[width=\textwidth]{img/Choice.png}
 \caption{Pop up contenente le possibili scelte.}
-\label{img:strategy}
+\label{img:Choice}
 \end{figure}
 
 \subsubsection{Fine round/Fine partita}
@@ -424,27 +441,27 @@ Il turno continuerà finché la condizione di fine round non si verifica.
 \begin{figure}[H]
 \centering{}
 \includegraphics[width=\textwidth]{img/Round_Over.png}
-\caption{Pop up che informa riguardo la fine del round.}
-\label{img:strategy}
+\caption{Pop up che informa sulla fine del round.}
+\label{img:Round_Over}
 \end{figure}
 
 \begin{figure}[H]
 \centering{}
 \includegraphics[width=\textwidth]{img/Game_Over.png}
-\caption{Pop up che informa riguardo la fine della partita.}
-\label{img:strategy}
+\caption{Pop up che informa sulla fine della partita.}
+\label{img:Game_Over}
 \end{figure}
 
 \section{Leaderboard}
 
-Una volta che finisce la partita si verrà indirizzati alla leaderboard, dalla quale è possibile tornare alla Home premendo il pulsante presente.
+Una volta che finisce la partita si verrà indirizzati al tabellone con la classifica della partita, dal quale è possibile tornare alla Home premendo il pulsante "Go back to Home page".
 \\Il giocatore vittorioso sarà quello che accumulerà più gemme.
 
 \begin{figure}[H]
 \centering{}
 \includegraphics[width=\textwidth]{img/Leaderboard_Page.png}
 \caption{Scermata della leaderboard.}
-\label{img:strategy}
+\label{img:Leaderboard_Page}
 \end{figure}
 
 \end{document}
