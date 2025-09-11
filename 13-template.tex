@@ -223,8 +223,8 @@ Questa implementazione permette di tenere distinti i \texttt{PlayerCpu} dalle pr
 \paragraph{Problema}: Si vogliono creare più difficoltà per la \texttt{LogicCpuImpl}.
 
 \paragraph{Soluzione}: Ho creato delle enumerazioni chiamate \texttt{CpuDifficulty} e \\\texttt{CpuDifficultyVariables} che rispettivamente contengono la denominazione delle difficoltà e le variabili di difficoltà utilizzate nella \texttt{LogicCpuImpl}.
-In questo modo tramite una mappa interna a \texttt{LogicCpuImpl} vengono abbinate le denominazioni delle difficoltà con i corrispettivi valori per le variabili che verranno usati all'interno di \texttt{LogicCpuImpl}.
-Questa implementazione modulata rende l'aggiunta di nuove difficoltà e/o variabili di difficoltà in \texttt{LogicCpuImpl} facile e chiara.
+In questo modo tramite una mappa interna a \texttt{LogicCpuImpl} vengono abbinate le denominazioni delle difficoltà con i corrispettivi valori per le variabili che verranno usate all'interno di \texttt{LogicCpuImpl}.
+Questa implementazione modulare rende l'aggiunta di nuove difficoltà e/o variabili di difficoltà in \texttt{LogicCpuImpl} facile e chiara.
 
 \paragraph{Uso di pattern}: Nessuno.
 
@@ -588,7 +588,7 @@ Se è il turno di un giocatore reale sarà possibile premere il pulsante "DRAW" 
 
 \subsubsection{Fase di decisione}
 
-Dopo la fase di pesca ciascun giocatore dovrà scegliere se rimanere in gioco oppure uscire premendo il bottone con la scelta desiderata, le CPU decideranno automaticamente.
+Dopo la fase di pesca ciascun giocatore dovrà scegliere se rimanere in gioco oppure uscire premendo il pulsante con la scelta desiderata, le CPU decideranno automaticamente.
 
 \begin{figure}[H]
 \centering{}
@@ -618,8 +618,8 @@ Il turno continuerà finché la condizione di fine round non si verifica.
 
 \section{Leaderboard}
 
-Una volta che finisce la partita si verrà indirizzati al tabellone con la classifica della partita, dal quale è possibile tornare alla Home premendo il pulsante "Go back to Home page".
-\\Il giocatore vittorioso sarà quello che accumulerà più gemme.
+Una volta che finisce la partita si verrà indirizzati al tabellone con la classifica finale, dal quale è possibile tornare alla Home premendo il pulsante "Go back to Home page".
+\\Il vincitore sarà colui che accumulerà più gemme.
 
 \begin{figure}[H]
 \centering{}
