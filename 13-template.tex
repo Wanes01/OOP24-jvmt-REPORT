@@ -241,7 +241,6 @@ Una versione schematizzata dell'architettura adoperata ~\ref{img:arch}:
 \section{Design dettagliato}
 
 %------
--------------------------------------
 \subsection{Andrea La Tosa}
 \subsubsection{Refactoring classe DeckImpl:}
 
@@ -258,9 +257,9 @@ DeckImpl aveva una classe annidata che aveva lo scopo di:
 \begin{itemize}
 	\item  calcolare le statistiche del mazzo(es. il numero di carte trappola, il numero totale di carte nel mazzo etc..) 
 	restituendole alla classe contenitore che a sua volta le avrebbe restituite verso l'esterno 
-	(logica poco intuitiva e ridondante)
-	\item  creare i vari tipi di mazzo (standard e special)
-	\item  Includere i metodi per aggiungere le carte al mazzo.
+	(logica poco intuitiva e ridondante),
+	\item  creare i vari tipi di mazzo (standard e special),
+	\item  includere i metodi per aggiungere le carte al mazzo.
 \end{itemize}
 %
 Questa implementazione risultava quindi confusionaria e difficilmente manutenibile.
@@ -268,12 +267,13 @@ Questa implementazione risultava quindi confusionaria e difficilmente manutenibi
 \paragraph{Refactoring effettuato:}
 
 Per risolvere queste problematiche è stato effettuato un refactoring strutturale che ha portato la divisione della classe originaria 
-in classi piu' semplici e con responsabiltà singole e ben definite adottando due noti design pattern: Builder e Factory.
+in classi piu' semplici e con responsabiltà singole e ben definite adottando tre noti design pattern: Iterator, Builder e Factory.
 Il refactoring ha portato alla definizione delle seguenti classi:
 \begin{itemize}
-	\item  DeckImpl: gestisce la logica del mazzo come le statistiche, l'estrazione delle carte e il mescolamento
+	\item  DeckImpl: gestisce la logica del mazzo come le statistiche, il mescolamento e l'estrazione delle carte.
+	Per quest'ultima funzionalità l'interfaccia della classe estende Iterator$<$Card$>$.
 	\item  DeckBuilderImpl: applica il pattern Builder per aggiungere al mazzo i vari tipi di carte e infine,medinate il metodo build(), creare un oggetto Deck.
-	\item  DeckFactory: applica il pattern Factory per la creazione di mazzi predefiniti (es. mazzo standard) sfruttando i metodi forniti da DeckBuilderImpl
+	\item  DeckFactoryImpl: applica il pattern Factory per la creazione di mazzi predefiniti (es. mazzo standard) sfruttando i metodi forniti da DeckBuilderImpl.
 \end{itemize}
 
 \paragraph{Benefici ottenuti dopo il refactoring:}
@@ -291,13 +291,11 @@ Il refactoring ha portato alla definizione delle seguenti classi:
 	\item  la comprensione del codice potrebbe risultare inizialmente piu' complessa.
 \end{itemize}
 
-
-%AGGIUNGE IMMAGINE UML DECK
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.8\textwidth]{\imgpath/UML_Deck.png}
-	\caption{Diagramma UML}
-	\label{fig:uml}
+	\includegraphics[height=0.9\textheight]{\imgpath/UML_Deck2.png}
+	\caption{Diagramma UML dopo il refactoring della classe DeckImpl con l'utilizzo dei pattern Iterator, Builder e Factory}
+	\label{fig:uml_deck_refactoring}
 \end{figure}
 
 
@@ -307,23 +305,23 @@ Il refactoring ha portato alla definizione delle seguenti classi:
 
 il gioco, come definito nella fase di analisi, prevede l'utilizzo di 4 tipologie di carte:
 \begin{itemize}
-	\item \textbf{Trappole:}
+	\item \textbf{Trappola:}
 	non hanno valore in gemme.
-	Nella modalità standard, quando vengono pescate 2 carte trappola uguali, il round termina
+	Vengono utilizzate per alcune condizioni di fine round.
 
 	\item \textbf{Tesoro:}
-	hanno un valore associato in gemme
+	hanno un valore associato in gemme.
 
 	\item \textbf{Reliquia:}
-	hanno un valore associato in gemme estratto da una sequenza di possibili valori
+	hanno un valore associato in gemme estratto da una sequenza di possibili valori.
 	
 	\item \textbf{Speciale} (non ancora implementate):
 	sono state pensate per aggiungere effetti particolari e dinamicità al gioco come ad esempio far perdere delle gemme dalla sacca di un giocatore.
-	Possono avere o meno avere un valore in gemme
+	Possono avere o meno un valore in gemme.
 \end{itemize}
 Il design di progettazione doveva tener conto:
 \begin{itemize}
-	\item delle 3 tipologie di carte effettivamente implementate
+	\item delle 3 tipologie di carte effettivamente implementate,
 
 	\item della possibilità di estendere il gioco con le carte speciali.
 \end{itemize}
@@ -334,9 +332,9 @@ La soluzione iniziale non permetteva nè di modellare in modo efficace la differ
 Il  primo approccio prevedeva una gerarchia con la seguente struttura:
 \begin{itemize}
 	\item Card:
-	la classe principale che definisce i comportamenti comuni a tutte le carte
+	la classe principale che definisce i comportamenti comuni a tutte le carte.
 	\item TreasureCard, RelicCard, TrapCard:
-	le classi che estendono Card e definiscono i comportamenti specifici delle rispettive carte
+	le classi che estendono Card e definiscono i comportamenti specifici delle rispettive carte.
 \end{itemize}
 %
 Tuttavia, in questo tipo di gerarchia era evidente la duplicazione della logica tra il comportamento delle carte reliquia e reperto.
@@ -351,12 +349,11 @@ Per risolvere il problema è stata aggiunta la classe intermedia CardWithGem.
 Questa descrive il comportamento generico delle carte (estendendo Card) ma aggiunge la logica delle gemme.
 Le classi RelicCard e TreasureCard estendono ora CardWithGem evitando la duplicazione di logica e codice.
 
-%AGGIUNGE IMMAGINE UML CARD
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=0.8\textwidth]{\imgpath/UML_Card.png}
-	\caption{Diagramma UML}
-	\label{fig:uml}
+	\caption{Diagramma UML della gerarchia delle carte dopo l'introduzione della classe intermedia CardWithGem}
+	\label{fig:uml_card_hierarchy}
 \end{figure}
 
 \noindent Questo refactoring ha anche anticipato l'aggiunta delle carte speciali in quanto:
@@ -373,10 +370,10 @@ Il testing automatizzato è stato effettuato con Junit, di seguito i vari test d
 \begin{itemize}
  \item Card:
     \begin{itemize}
-    \item DeckTest: i test sono stati effettuati sulla configurazione standard del deck, comprendono la corretta composizione del mazzo e l'estrazione delle carte
-	\item TrapCardTest: testing riguardante il comportamento comune delle carte
-	\item RelicCardTest: oltre ai test sui metodi comuni delle carte è stato verificato anche il riscatto, lo stato relativo e i valori di gemme possibili
-	\item TreasureCardTest: oltre ai test sui metodi comuni delle carte sono stati verificati i valori di gemme ammessi
+    \item DeckTest: i test sono stati effettuati sulla configurazione standard del deck, comprendono la corretta composizione del mazzo e l'estrazione delle carte.
+	\item TrapCardTest: testing riguardante il comportamento comune delle carte.
+	\item RelicCardTest: oltre ai test sui metodi comuni delle carte è stato verificato anche il riscatto, lo stato relativo e i valori di gemme possibili.
+	\item TreasureCardTest: oltre ai test sui metodi comuni delle carte sono stati verificati i valori di gemme ammessi.
     \end{itemize}
  \item Round:
     \begin{itemize}
@@ -416,6 +413,8 @@ Il testing automatizzato è stato effettuato con Junit, di seguito i vari test d
 
 \subsubsection{Utilizzo della dipendenza esterna MigLayout:}
 Utilizzato in vari punti, un esempio: \url{https://github.com/Wanes01/OOP24-jvmt/blob/ccdbae592c490476d3226350cbdbbeb99e32a596/src/main/java/jvmt/view/page/impl/SwingSettingsPage.java#L189C17-L192C50}
+
+\subsubsection{Utilizzo di consumer:} \url{https://github.com/Wanes01/OOP24-jvmt/blob/ccdbae592c490476d3226350cbdbbeb99e32a596/src/main/java/jvmt/controller/impl/SettingsControllerImpl.java#L93C1-L93C49}
 %------------------
 
 
@@ -425,11 +424,9 @@ Utilizzato in vari punti, un esempio: \url{https://github.com/Wanes01/OOP24-jvmt
 \section{Autovalutazione e lavori futuri}
 
 \subsection{Andrea La Tosa}
-
-%Ho dato del mio meglio per fare la mia parte in questo progetto. Nonostante non abbia utilizzato tecniche avanzate di Java quali i pattern o i generici, ritengo di aver scritto codice pulito e ben comprensibile.
-%Vado molto fiero della logica delle CPU, la quale ha preso una moderata quantità tempo per farla comportare come desideravo.
-%Seppur non abbia brillato molto nella parte di model, mi sono impegnato quanto più potevo nei controller e nelle corrispettive pagine (Gameplay e Leaderboard), portando un risultato che reputo più che apprezzabile sia dal lato grafico che dal lato del codice.
-%Ritengo tutto sommato che il mio contributo per il gruppo sia stato importante anche se un po' grezzo e non troppo brillante.
+Ho svolto la mia parte di progetto al meglio delle mie capacità e ritengo di aver dato un valido contributo al gruppo.
+Il progetto è stato svolto in un ambiente sereno e tranquillo il che ha reso molto facile scambiarsi idee e punti di vista, senza i quali avrei prodotto codice meno leggibile e manutenibile.
+Sono molto contento del codice che ho prodotto anche se devo ammettere che ho percepito molto la mia inesperienza in certi argomenti, primo fra tutti GitHub. 
 
 
 \appendix

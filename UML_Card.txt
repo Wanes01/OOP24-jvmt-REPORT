@@ -1,0 +1,39 @@
+---
+config:
+  layout: dagre
+  class:
+    hideEmptyMembersBox: true
+---
+classDiagram
+direction TB
+    class TypeCard {
+    }
+    class TypeTrapCard {
+    }
+    class Card {
+	    +String getName()
+	    +TypeCard getType()
+	    +URL getImagePath()
+    }
+    class CardWithGem {
+	    +int getGemValue()
+    }
+    class RelicCard {
+	    +boolean isRedeemed()
+	    +void redeemCard()
+    }
+    class TrapCard {
+	    +TypeTrapCard getTypeTrap()
+    }
+    class TreasureCard {
+    }
+
+	<<enumeration>> TypeCard
+	<<enumeration>> TypeTrapCard
+
+    Card -- TypeCard : uses
+    Card <|-- CardWithGem
+    CardWithGem <|-- RelicCard
+    Card <|-- TrapCard
+    TrapCard -- TypeTrapCard : uses
+    CardWithGem <|-- TreasureCard

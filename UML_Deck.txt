@@ -1,0 +1,48 @@
+---
+config:
+  class:
+    hideEmptyMembersBox: true
+---
+classDiagram
+direction TB
+    class Deck {
+	    +numberOfRemainingCards() int
+	    +peekCard() Card
+	    +deckSize() int
+	    +totRelicCardsInDeck() int
+	    +totTreasureCardsInDeck() int
+	    +totTrapCardsInDeck() int
+	    +totTrapCardTypesInDeck() int
+	    +totSpecialCardInDeck() int
+	    +getShuffledCopy() Deck
+    }
+    class DeckBuilder {
+	    +build() Deck
+	    +addTrap(type : TypeTrapCard) DeckBuilder
+	    +addMultipleTrap(typeTrap : TypeTrapCard, numTrap : int) DeckBuilder
+	    +addTreasure(gemValue :  int) DeckBuilder
+	    +addMultipleTreasure(gemValue : int, numTreasure : int) DeckBuilder
+	    +addRelic() DeckBuilder
+	    +addMultipleRelic(numRelic int) DeckBuilder
+	    +shuffle() DeckBuilder
+    }
+    class DeckFactory {
+	    +standardDeck() Deck
+	    +specialDeck() Deck
+    }
+    class Iterator~Card~{
+	    +hasNext() boolean
+	    +next() Card
+    }
+    class Card {
+    }
+
+	<<Interface>> Deck
+	<<Interface>> DeckBuilder
+	<<Interface>> DeckFactory
+	<<Interface>> Iterator
+
+    DeckFactory --> DeckBuilder : uses
+    DeckBuilder --> Deck : build() return
+    Deck --|> Iterator
+    Iterator~Card~ --> Card : uses
