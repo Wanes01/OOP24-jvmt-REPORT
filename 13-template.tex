@@ -244,33 +244,48 @@ Una versione schematizzata dell'architettura adoperata ~\ref{img:arch}:
 \centering{}
 \includegraphics[width=\textwidth]{img/UML_PlayerCpu.png}
 \caption{Rappresentazione UML}
-\label{img:strategy}
+\label{img:PlayerCpu}
 \end{figure}
 
-\paragraph{Problema} Si vogliono creare giocatori che danno scelte automatizzate.
+\paragraph{Problema}: Si vogliono creare giocatori che danno scelte automatizzate.
 
-\paragraph{Soluzione} Ho creato la classe PlayerCpu come estensione della classe rappresentante i giocatori reali (PlayerInRound), la quale ha al suo interno un'istanza di LogicCpuImpl che le permette di assumere scelte automatizzate basate sulle informazioni della partita tramite il metodo cpuChoice().
-In questo modo PlayerCpu funziona come un'effettiva CPU in grado di prendere decisioni autonomamente.
-Questa implementazione permette di tenere distinti i PlayerCpu dalle proprie logiche rendendo il tutto più modulare.
+\paragraph{Soluzione}: Ho creato la classe \texttt{PlayerCpu} come estensione della classe rappresentante i giocatori reali \texttt{PlayerInRound}, la quale ha al suo interno un'istanza di \texttt{LogicCpuImpl} che le permette di assumere scelte automatizzate basate sulle informazioni della partita tramite il metodo cpuChoice().
+In questo modo \texttt{PlayerCpu} funziona come un'effettiva CPU in grado di prendere decisioni autonomamente.
+Questa implementazione permette di tenere distinti i \texttt{PlayerCpu} dalle proprie logiche rendendo il tutto più modulare.
 
-\paragraph{Uso di pattern} Nessuno.
+\paragraph{Uso di pattern}: Nessuno.
 
-\subsubsection{Creazione di più diificoltà per la LogicCpuImpl}
+\subsubsection{Creazione di più difficoltà per la LogicCpuImpl}
 
 \begin{figure}[H]
 \centering{}
-\includegraphics[width=\textwidth]{img/UML_LogicCpu.png}
+\includegraphics[height=\textwidth]{img/UML_LogicCpu.png}
 \caption{Rappresentazione UML}
-\label{img:template}
+\label{img:LogicCpu}
 \end{figure}
 
-\paragraph{Problema} Si vogliono creare più difficoltà per la LogicCpuImpl.
+\paragraph{Problema}: Si vogliono creare più difficoltà per la \texttt{LogicCpuImpl}.
 
-\paragraph{Soluzione} Ho creato delle enumerazioni chiamate CpuDifficulty e CpuDifficultyVariables che rispettivamente contengono la denominazione delle difficoltà e le variabili di difficoltà utilizzate nella LogicCpu.
-In questo modo tramite una mappa interna a LogicCpu vengono abbinate le denominazioni delle difficoltà con i corrispettivi valori per le variabili che verranno usati all'interno di LogicCpu.
-Questa implementazione modulata rende l'aggiunta di nuove difficoltà e/o variabili di difficoltà in LogicCpu facile e chiara.
+\paragraph{Soluzione}: Ho creato delle enumerazioni chiamate \texttt{CpuDifficulty} e \\\texttt{CpuDifficultyVariables} che rispettivamente contengono la denominazione delle difficoltà e le variabili di difficoltà utilizzate nella \texttt{LogicCpuImpl}.
+In questo modo tramite una mappa interna a \texttt{LogicCpuImpl} vengono abbinate le denominazioni delle difficoltà con i corrispettivi valori per le variabili che verranno usati all'interno di \texttt{LogicCpuImpl}.
+Questa implementazione modulata rende l'aggiunta di nuove difficoltà e/o variabili di difficoltà in \texttt{LogicCpuImpl} facile e chiara.
 
-\paragraph{Uso di pattern} Nessuno.
+\paragraph{Uso di pattern}: Nessuno.
+
+\subsubsection{Iterazione dei \texttt{Round} durante la partita}
+
+\begin{figure}[H]
+\centering
+\includegraphics[height=\textwidth]{img/UML_Game.png}
+\caption{Rappresentazione UML}
+\label{img:Game}
+\end{figure}
+
+\paragraph{Problema}: Si vuole passare da un \texttt{Round} ad un altro, avendo a disposizione le informazioni dei tali e delle impostazioni della partita.
+
+\paragraph{Soluzione}: Ho creato l'interfaccia \texttt{Game} che estende \texttt{Iterator<Round>}. In questo modo passare da un round ad un altro avendo a disposizione tutte le loro informazioni.
+
+\paragraph{Uso di pattern}: \texttt{Iterator}.
 
 \chapter{Sviluppo}
 \section{Testing automatizzato}
@@ -318,13 +333,21 @@ Il testing automatizzato è stato effettuato con Junit, di seguito i vari test d
 
 Utilizzati in vari punti. Un esempio è \url{https://github.com/Wanes01/OOP24-jvmt/blob/9868185e06e775b7011bac211c5de46acbe0aa47/src/main/java/jvmt/controller/impl/LeaderboardControllerImpl.java#L48C1-L53C6}
 
+\subsubsection{Utilizzo del pattern Iterator}
+
+\url{https://github.com/Wanes01/OOP24-jvmt/blob/ccdbae592c490476d3226350cbdbbeb99e32a596/src/main/java/jvmt/model/game/api/Game.java#L19}
+
+\subsubsection{Utilizzo di Optional}
+
+\url{https://github.com/Wanes01/OOP24-jvmt/blob/ccdbae592c490476d3226350cbdbbeb99e32a596/src/main/java/jvmt/controller/impl/GameplayControllerImpl.java#L197-L206}
+
 \chapter{Commenti finali}
 
 \section{Autovalutazione e lavori futuri}
 
 \subsection{Filippo Gaggi}
 
-Ho dato del mio meglio per fare la mia parte in questo progetto. Nonostante non abbia utilizzato tecniche avanzate di Java quali i pattern o i generici, ritengo di aver scritto codice pulito e ben comprensibile.
+Ho dato del mio meglio per fare la mia parte in questo progetto. Nonostante non abbia utilizzato molte tecniche avanzate di Java, ritengo di aver scritto codice pulito e ben comprensibile.
 Vado molto fiero della logica delle CPU, la quale ha preso una moderata quantità tempo per farla comportare come desideravo.
 Seppur non abbia brillato molto nella parte di model, mi sono impegnato quanto più potevo nei controller e nelle corrispettive pagine (Gameplay e Leaderboard), portando un risultato che reputo più che apprezzabile sia dal lato grafico che dal lato del codice.
 Ritengo tutto sommato che il mio contributo per il gruppo sia stato importante anche se un po' grezzo e non troppo brillante.
