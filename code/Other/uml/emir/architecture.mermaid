@@ -1,0 +1,49 @@
+---
+config:
+  layout: elk
+  class:
+    hideEmptyMembersBox: true
+---
+classDiagram
+direction TB
+    class MainController {
+    }
+    class PageController {
+    }
+    class GameAwarePageController {
+    }
+    class ControllerAwarePage {
+    }
+    class PageNavigator {
+    }
+    class Window {
+    }
+    class Game {
+    }
+    class Page {
+    }
+
+	<<interface>> MainController
+	<<abstract>> PageController
+	<<abstract>> GameAwarePageController
+	<<abstract>> ControllerAwarePage
+	<<interface>> PageNavigator
+	<<interface>> Window
+	<<interface>> Game
+	<<interface>> Page
+
+    MainController --> Window : manages
+    MainController --> PageNavigator : manages
+    MainController --> Page : manages
+    MainController --> PageController : manages
+    PageController o-- PageNavigator : </br>
+    GameAwarePageController --|> PageController
+    GameAwarePageController o-- Game : <br>
+    ControllerAwarePage --|> Page
+    PageNavigator --> Page : registers
+    Window --> Page : displays
+    PageController o-- ControllerAwarePage : <br>
+
+
+
+(MANCA UNA AGGREGAZIONE! Falla su PhotoShop perchè mermaid la sminchia)

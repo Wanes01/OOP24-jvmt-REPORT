@@ -133,53 +133,8 @@ round ed un forziere per mantenere le proprie gemme tra un round e l'altro.
 Ad ogni round viene associato un effetto speciale che ne determina
 la condizione di fine e un eventuale modificatore applicato alle gemme.
 
-
-
-\subsection*{Elementi positivi}
-\begin{itemize}
-	\item Si modella il dominio in forma di UML\@.
-	\item Viene descritto accuratamente il modello del dominio.
-	\item Il modello cattura le entità di dominio, le loro caratteristiche principali,
-	\item e le relazioni che intercorrono fra di loro.
-\end{itemize}
-
-\subsection*{Elementi negativi}
-\begin{itemize}
-	\item Manca una descrizione a parole del modello del dominio.
-	\item Manca una descrizione UML delle entità del dominio e delle relazioni che intercorrono fra loro.
-	\item Vengono presentati elementi di design, o peggio, implementativi.
-	\item Viene mostrato uno schema UML che include elementi implementativi o non utili alla descrizione del dominio,
-	ma volti alla soluzione (non devono vedersi, ad esempio, campi o metodi privati).
-\end{itemize}
-
 % !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 % QUA C'E' DA METTERE L'UML ASTRATTISSIMO DEL DOMINIO.
-
-\subsection*{Esempio}
-GLaDOS dovrà essere in grado di accedere ad un'insieme di camere di test.
-%
-Tale insieme di camere prende il nome di percorso.
-%
-Ciascuna camera è composta di challenge successivi.
-%
-GLaDOS è responsabile di associare a ciascun challenge un insieme di consigli (suggestions) destinati all'utente (subject), dipendenti da possibili eventi.
-%
-GLaDOS dovrà poter comunicare coi locali cucina per approntare le torte.
-%
-Le torte potranno essere dolci, oppure semplici promesse di dolci che verranno disattese.
-%
-Gli elementi costitutivi il problema sono sintetizzati in \Cref{img:analysis}.
-
-Data la complessità di elaborare consigli via AI senza intervento umano, la prima versione del software fornita prevederà una serie di consigli forniti dall'utente.
-%
-Il requisito non funzionale riguardante il consumo energetico richiederà studi specifici sulle performance di GLaDOS che non potranno essere effettuati all'interno del monte ore previsto: tale feature sarà oggetto di futuri lavori.
-
-\begin{figure}[H]
-	\centering{}
-	\includegraphics{img/analysis.pdf}
-	\caption{Schema UML dell'analisi del problema, con rappresentate le entità principali ed i rapporti fra loro}
-	\label{img:analysis}
-\end{figure}
 
 \chapter{Design}
 
@@ -192,12 +147,13 @@ In particolare:
 \begin{itemize}
 	\item \textbf{Model}: definito dall'interfaccia \textit{Game}; rappresenta il punto di accesso
 	al dominio dell'applicazione.
-	\item \textbf{View}: viene definita dalle interfacce \textit{Window} e \textit{Page} che
-	rappresentano la finestra principale di visualizzazione e le singole pagine che possono
-	essere rappresentate su di essa.
+	\item \textbf{View}: viene definita dalle interfacce \textit{Window}, rappresentante la finestra
+	principale di visualizzazione, \textit{Page} rappresentante le singole pagine che possono
+	essere rappresentate su una Window e \textit{ControllerAwarePage}, specializzazione astratta di Page,
+	rappresenta una pagina interagibile (che adotta un controller).
 	\item \textbf{Controller}: definita da \textit{MainController}, il quale avvia l'applicazione,
 	\textit{PageController} che definisce l'interazione su una pagina specifica e
-	\textit{GameAwarePageController}, simile a PageController ma con accesso
+	\textit{GameAwarePageController}, specializzazione di PageController con accesso
 	ad informazioni sul model (Game). I controller per le pagine gestiscono la navigazione
 	tra queste ultime tramite \textit{PageNavigator}.
 \end{itemize}
@@ -209,8 +165,9 @@ Le interazioni principali di questa architettura sono:
 	il PageNavigator, le varie Page e rispettivi PageController.
 	\item GameAwarePageController estende PageController; interagisce con
 	Game per recuperare informazioni sullo stato della partita.
-	\item Ogni PageController è associato a un'unica Page e
-	utilizza il PageNavigator per cambiare visualizzazione.
+	\item Ogni PageController controlla un'unica ControllerAwarePage (pagina interagibile) e
+	utilizza il PageNavigator per cambiare visualizzazione. Allo stesso modo ogni ControllerAwarePage
+	utilizza un PageController per associare gli eventi sulla pagina.
 	\item Window ha il compito di essere un contenitore per Page e si
 	occupa di mostrarle all'utente.
 	\item PageNavigator gestisce la transizione
@@ -228,14 +185,13 @@ Una versione schematizzata dell'architettura adoperata ~\ref{img:arch}:
 
 \begin{figure}[H]   % H maiuscola
 \centering
-\includegraphics[width=\textwidth]{img/architecture}
+\includegraphics[width=0.7\textwidth]{img/architecture}
 \caption{Schema UML architetturale di Javamant.}
 \label{img:arch}
 \end{figure}
 
 
 \section{Design dettagliato}
-
 \subsection{Filippo Gaggi}
 
 \subsubsection{Creazione di giocatori con scelte automatizzate}
@@ -287,41 +243,193 @@ Questa implementazione modulata rende l'aggiunta di nuove difficoltà e/o variab
 
 \paragraph{Uso di pattern}: \texttt{Iterator}.
 
+\subsection{Emir Wanes Aouioua}
+\subsection*{Effetto speciale del round}
+\begin{description}
+  \item[\textbf{Problema}]: 
+L'effetto speciale del round determina le regole per cui un round deve finire e la quantità di gemme distribuite
+  ai giocatori: questi due aspetti non sono fissi all'interno dell'esplorazione di una grotta e possono dipendere
+  da informazioni riguardanti lo stato del round. Serve
+  un modo semplice per cambiare queste regole senza modificare come un round opera.
+\item[\textbf{Soluzione}]: 
+Viene utilizzato il pattern \textit{Strategy} per incapsulare, in modo modulare
+\begin{itemize}
+	\item come un round deve terminare, tramite l'interfaccia \texttt{EndCondition} che decide se un round
+	ha raggiunto la sua fine ispezionando lo stato di quest'ultimo.
+	\item come le gemme vengono modificare prima di essere guadagnate dai giocatori, tramite
+	l'interfaccia \texttt{GemModifier} che applica una trasformazione alle gemme ricevute
+	dopo aver ispezionato lo stato del round.
+\end{itemize}
+Entrambi vengono creati tramite \textit{Factory Method} e accoppiati in un
+\texttt{RoundEffect}, usato dal Round senza conoscere i dettagli di come esso agisce ~\ref{img:effects}.
+
+\begin{figure}[H]   % H maiuscola
+\centering
+\includegraphics[width=\textwidth]{img/effects}
+\caption{Il diagramma mostra come EndCondition e GemModifier rappresentino le stategie, creati
+dalle rispettive factory e composti in RoundEffectImpl. RoundImpl può utilizzare
+le due strategie in modo completamente interscambiabile.}
+\label{img:effects}
+\end{figure}
+
+\item[\textbf{Pro}]:
+l'utilizzo del pattern Strategy permette una facile interscambiabilità tra
+diversi tipi di approcci alla fine del round e alla modifica delle gemme, senza che avvenga alcuna
+modifica al Round. L'utilizzo di Factory Method permette di centrallizare la creazione delle varie
+strategie, riducendo la proliferazione di classi.
+\item[\textbf{Contro}]:
+se si volessero combinare più stategie (come ad esempio rendere due diverse
+condizioni di fine vere per terminare il round), occorrerebbe introdurre nuove strategie
+composte, come classi singole o metodi nella factory. Una possibile soluzione a questo
+problema è l'utilizzo del pattern Decorator, il quale non viene utilizzato. 
+\end{description}
+
+\subsection*{Iterazione solo sui giocatori in esplorazione}
+\begin{description}
+	\item[\textbf{Problema}]: durante un round i giocatori possono decidere di uscire.
+	Serve un modo per poter passare al prossimo giocatore attivo, saltando
+	quelli che hanno abbandonato l'esplorazione della grotta.
+
+	\item[\textbf{Soluzione}]: Uso del pattern \textit{Iterator} da parte
+	dell'interfaccia \texttt{RoundPlayerManager} che estende \texttt{Iterator<Player>}
+	per ottenere con una sola chiamata il giocatore del prossimo turno ~\ref{img:playermanager}.
+
+	\begin{figure}[H]   % H maiuscola
+	\centering
+	\includegraphics[width=0.4\textwidth]{img/playermanager}
+	\caption{Il diagramma mostra come RoundPlayerManager sia un iteratore di Player,
+	permettendo di ottenere il prossimo giocatore attivo e capire se ci sono
+	ancora giocatori in esplorazione.}
+	\label{img:playermanager}
+	\end{figure}
+
+	\item[\textbf{Pro}]: l'utilizzatore di RoundPlayerManager non deve preoccuparsi della
+	logica con cui il prossimo giocatore della partita viene scelto, questo
+	garantisce flessibilità e rimuove la responsabilità di scegliere il prossimo
+	giocatore dal round.
+
+	\item[\textbf{Contro}]: una volta che l'Iterator viene consumato non è più
+	riutilizzabile ed è necessario crearne un altro. 
+\end{description}
+
+\subsection*{Lazy binding del controller nella view}
+\begin{description}
+	\item[\textbf{Problema}]: per via dell'architettura scelta, ogni \texttt{Page} che
+	necessita di interagibilità ha bisogno che venga associata ad uno specifico \texttt{PageController}; 
+	gli handler degli eventi relativi ai componenti grafici delle pagine variano per ognuna di esse
+	e devono essere inizializzati solo quando lo specifico PageController viene assegnato alla pagina.
+	Serve un modo per impostare gli handler dei componenti grafici non appena viene scelto quale
+	PageController utilizzare sulla pagina.
+
+	\item[\textbf{Soluzione}]: tramite l'applicazione del pattern \textit{Template Method} la specializzazione 
+	astratta di Page che modella pagine interagibili, \texttt{ControllerAwarePage}, richiama il metodo astratto \texttt{setHandlers()}
+	nel momento in cui nella Page viene associato il proprio controller effettuando una chiamata al metodo
+	\texttt{setController(PageController)}.
+	In questo caso il metodo \texttt{setController(PageController)} costituisce il template method: esso associa
+	il controller ed imposta gli handler della visualizzazione senza preoccuparsi di come le pagine \texttt{ControllerAwarePage}
+	inizializzino questi ultimi. ~\ref{img:ctrl_bind}.
+
+	\begin{figure}[H]   % H maiuscola
+	\centering
+	\includegraphics[width=0.85\textwidth]{img/ctrl_bind}
+	\caption{Il diagramma mostra il pattern Template Method applicato a ControllerAwarePage, in cui
+	il metodo \texttt{setController(PageController)} fa da metodo template e \texttt{setHandlers()} da hook.
+	Nota: il metodo getController(class) viene utilizzato per evitare la propagazione dei generici a tutto
+	l'albero strutturale: esso è un metodo utilizzabile dalle ControllerAwarePage che effettua un
+	cast sicuro alle specializzazioni di PageController.}
+	\label{img:ctrl_bind}
+	\end{figure}
+
+	\item[\textbf{Pro}]: c'è una separazione netta delle responsabilità: la logica comune
+	(l'impostazione del controller) viene centralizzata in \texttt{ControllerAwarePage} mentre le sue estensioni
+	si occupano solo di specificare quali eventi devono essere associati al controller. Questo
+	comporta anche una riduzione del codice duplicato; estendibilità semplice: per aggiungere una nuova
+	pagina interagibile basta implementare \texttt{setHandlers()}.
+
+	\item[\textbf{Contro}]: con Template Method la struttura diventa rigida: se si volesse cambiare
+	un comportamento di \texttt{ControllerAwarePage} comporterebbe probabile duplicazione di codice.
+	Un'altra problematica è il fatto che una pagina interagibile deve forzatamente estendere
+	\texttt{ControllerAwarePage}, bloccando la possibilità di estendere da altre classi 
+	(ad esempio, SwingPage avrebbe potuto estendere direttamente JPanel).
+\end{description}
+
+\subsection*{Centralizzazione della navigazione tra pagine}
+\begin{description}
+	\item[\textbf{Problema}]: essendo la natura dell'applicazione interattiva e multipagina,
+	occorre un modo per poter passare da una visualizzazione all'altra senza che un \texttt{PageController}
+	mantenga riferimenti a pagine su cui non deve gestire l'interazione (un PageController deve
+	gestire una ed una sola pagina).
+
+	\item[\textbf{Soluzione}]: si centralizza la logica di navigazione tra \texttt{Page}
+	all'interno di un navigatore: \texttt{PageNavigator}. Il navigatore si occupa di registrare
+	le pagine associandole ad una chiave (in questo caso l'enumerazione \texttt{PageId})
+	e cambiare la visualizzazione tramite quest'ultima. In questo modo PageController
+	non dovrà preoccuparsi di mantenere riferimenti a pagine su cui non deve gestire l'interazione. ~\ref{img:navigator}
+	Questo approccio non utilizza alcun design pattern.
+	\footnote{Questo approccio non rappresenta alcun OOP design pattern ma è un pattern architetturale
+	molto utilizzato in ambito mobile e web per la navigazione multipagina.}
+
+	\begin{figure}[H]   % H maiuscola
+	\centering
+	\includegraphics[width=0.4\textwidth]{img/navigator}
+	\caption{Il diagramma mostra come PageController gestisca una singola pagina
+	e come PageNavigator coordini la navigazione verso altre pagine.}
+	\label{img:navigator}
+	\end{figure}
+
+	\item[\textbf{Pro}]: tutta la logica del passaggio da una pagina all'altra
+	viene centralizzata in \texttt{PageNavigator}, riducendo la duplicazione di codice
+	e favorendo il riutilizzo. PageController non necessita di alcuna informazione
+	sulle altre pagine: gli basta conoscere la chiave associata. Si possono aggiungere
+	nuove pagine navigabili in modo facile: basta registrare una coppia
+	\texttt{(PageId, Page)}.
+
+	\item[\textbf{Contro}]: l'utilizzo di \texttt{PageId} come chiave
+	per navigare tra le pagine rende impossibile l'aggiunta di pagine create
+	in modo dinamico poichè PageId presenta un numero finito di chiavi associabili
+	(ad esempio, in futuro si potrebbe voler aggiungere pagine senza
+	struttura statica, create sul momento in base allo stato della partita).
+\end{description}
+
 \chapter{Sviluppo}
 \section{Testing automatizzato}
 
-Il testing automatizzato è stato effettuato con Junit, di seguito i vari test divisi per sezioni:
+Il testing automatizzato è stato effettuato con \textit{JUnit}. Per motivi di tempo non siamo
+riusciti a testare la GUI e la maggior parte del controller, decidendo di dare precedenza
+ai test delle classi di dominio. Di sequito i test effettuati da ogni componente del gruppo:
 \begin{itemize}
- \item Card:
+ \item \textbf{Andrea La Tosa}:
 	\begin{itemize}
-	\item DeckTest:
-	\item RelicCardTest:
-	\item TrapCardTest:
-	\item TreasureCardTest:
+	\item \texttt{DeckTest}:
+	\item \texttt{RelicCardTest}:
+	\item \texttt{TrapCardTest}:
+	\item \texttt{TreasureCardTest}:
 	\end{itemize}
- \item Round:
+ \item \textbf{Emir Wanes Aouioua}:
 	\begin{itemize}
-	\item EndConditionFactoryImplTest:
-	\item GemModifierFactoryImplTest:
-	\item RoundImplTest:
-	\item RoundPlayersManagerImplTest:
-	\item RoundStateImplTest:
-	\item TurnImplTest:
-	\item FullGameTest:
+		\item \texttt{EndConditionFactoryImplTest}: mi sono assicurato che tutte le
+			condizioni di fine round rispettassero i criteri con cui erano state definite.
+		\item \texttt{GemModifierFactoryImplTest}: mi sono assicurato che i modificatori
+			di gemme restituissero la quantità corretta di gemme, modificate in base allo stato di un round.
+		\item \texttt{RoundImplTest}: mi sono assicurato che un round gestisse correttamente 
+			l'iterazione dei turni e che alcune chiamate ai metodi avvenissero nel giusto ordine.
+		\item \texttt{RoundPlayersManagerImplTest}: mi sono assicurato che,
+			in un round venisse riconosciuto il giocatore corretto per il turno successivo.
+		\item \texttt{RoundStateImplTest}: mi sono assicurato che le informazioni
+			condivise sullo stato del round fossero corrette.
+		\item \texttt{TurnImplTest}: mi sono assicurato che i metodi di un turno venissero
+			utilizzati nel giusto ordine e che la distribuzione delle gemme fosse quella aspettata.
+		\item \texttt{FullGameTest}: questo test simula un numero di \texttt{N} partite (nel test fissato a 1000).
+		\item \texttt{PageNavigatorImpl}: mi sono assicurato che il sistema di navigazione tra pagine
+			funzionasse correttamente, spostando la visualizzazione e rilevando la pagina corrente quando richiesto.
 	\end{itemize}
- \item Player:
+ \item \textbf{Filippo Gaggi}:
 	\begin{itemize}
-	\item LogicCpuTest: Testing riguardante la correttezza di comportamento di LogicCpuImpl nelle 3 difficoltà.
-	\item PlayerInRoundTest: Testing riguardante la correttezza dei metodi di PlayerInRound.
-	\item PlayerCpuTest: Testing riguardante la correttezza dei metodi di PlayerCpu.
-	\end{itemize}
- \item Settings:
-	\begin{itemize}
-	\item GameSettingsTest: Testing riguardante la correttezza di comportamento dei controlli di GameSettingsImpl.
-	\end{itemize}
- \item Leaderboard:
-	\begin{itemize}
-	\item LeaderboardTest: Testing riguardante la correttezza dei metodi di LeaderboardImpl.
+	\item \texttt{LogicCpuTest}: Testing riguardante la correttezza di comportamento di LogicCpuImpl nelle 3 difficoltà.
+	\item \texttt{PlayerInRoundTest}: Testing riguardante la correttezza dei metodi di PlayerInRound.
+	\item \texttt{PlayerCpuTest}: Testing riguardante la correttezza dei metodi di PlayerCpu.
+	\item \texttt{GameSettingsTest}: Testing riguardante la correttezza di comportamento dei controlli di GameSettingsImpl.
+	\item \texttt{LeaderboardTest}: Testing riguardante la correttezza dei metodi di LeaderboardImpl.
 	\end{itemize}
 \end{itemize}
 
@@ -337,6 +445,36 @@ Utilizzati in vari punti. Un esempio è \url{https://github.com/Wanes01/OOP24-jv
 
 \url{https://github.com/Wanes01/OOP24-jvmt/blob/ccdbae592c490476d3226350cbdbbeb99e32a596/src/main/java/jvmt/controller/impl/GameplayControllerImpl.java#L197-L206}
 
+\subsection{Emir Wanes Aouioua}
+\subsubsection*{Progettazione con generici}
+Utilizzati in vari punti, sia per design di classe che su singoli metodi:
+\url{https://github.com/Wanes01/OOP24-jvmt/blob/ccdbae592c490476d3226350cbdbbeb99e32a596/src/test/java/jvmt/navigator/PageNavigatorImplTest.java#L99C1-L101C64}
+
+\subsubsection*{Uso di lamda expressions}
+Utilizzate molto spesso:
+\url{https://github.com/Wanes01/OOP24-jvmt/blame/ccdbae592c490476d3226350cbdbbeb99e32a596/src/main/java/jvmt/model/round/impl/roundeffect/gemmodifier/GemModifierFactoryImpl.java#L43}
+
+\subsubsection*{Uso di \texttt{Stream}}
+Utilizzati molto spesso:
+\url{https://github.com/Wanes01/OOP24-jvmt/blob/ccdbae592c490476d3226350cbdbbeb99e32a596/src/main/java/jvmt/model/round/impl/roundeffect/endcondition/EndConditionFactoryImpl.java#L79C1-L80C52}
+
+\subsubsection*{Uso di \texttt{Optional}}
+Utilizzati frequentemente per evitare \texttt{null}:
+\url{https://github.com/Wanes01/OOP24-jvmt/blame/ccdbae592c490476d3226350cbdbbeb99e32a596/src/main/java/jvmt/model/round/impl/turn/TurnImpl.java#L60}
+
+\subsubsection*{Uso di interfacce funzionali}
+Utilizzate frequentemente:
+\url{https://github.com/Wanes01/OOP24-jvmt/blob/ccdbae592c490476d3226350cbdbbeb99e32a596/src/main/java/jvmt/model/round/impl/RoundStateImpl.java#L88C1-L89C44}
+
+\subsection*{Codice di terze parti}
+\begin{itemize}
+	\item ho effettuato un adattamento dello snipper di \textit{Joel Carranza} come risposta
+	alla sequente domanda su StackOverflow. \footnote{Joel Carranza, font scalabile a prescindere dal DPI: \url{https://stackoverflow.com/questions/1102216/can-i-set-the-dpi-resolution-of-my-java-swing-application-without-changing-the-s}}
+	L'adattamento viene utilizzato nella classe \texttt{SwingWindow} per adattare la dimensione del font
+	per tutte le pagine Swing in base al DPI dello schermo utilizzato. 
+	
+\end{itemize}
+
 \chapter{Commenti finali}
 
 \section{Autovalutazione e lavori futuri}
@@ -347,6 +485,36 @@ Nonostante non abbia utilizzato molte tecniche avanzate di Java, ritengo di aver
 Vado molto fiero della logica delle CPU, la quale ha preso una moderata quantità tempo per farla comportare come desideravo.
 Seppur non abbia brillato molto nella parte di model, mi sono impegnato quanto più potevo nei controller e nelle corrispettive pagine (Gameplay e Leaderboard), portando un risultato che reputo più che apprezzabile sia dal lato grafico che dal lato del codice.
 Ritengo tutto sommato che il mio contributo al gruppo sia stato importante anche se un po' grezzo e non troppo brillante.
+
+\subsection{Emir Wanes Aouioua}
+Nel complesso, sono soddisfatto del lavoro svolto nel progetto. Dopo la fase iniziale di analisi
+del dominio assieme ai miei colleghi, mi sono occupato in modo particolare della parte di model
+e della definizione dello scheletro architetturale. Questo mi ha portato ad assumere un ruolo
+piuttosto centrale nelle scelte progettuali, che spesso è risultato anche più
+impegnativo di quanto avessi previsto.
+Ammetto che la divisione del carico di lavoro non sia stata ben bilanciata, ma considero
+questo un aspetto naturale ed inevitabile in un primo progetto di sviluppo cooperativo, e nonostante
+senta di aver avuto un maggior numero di responsabilità
+penso che ciascuno di noi abbia messo a disposizione al meglio le proprie competenze
+contribuendo al progetto. Sono contento della coesione e disponibilità reciproca che si è mantenuta
+all'interno del gruppo dall'inizio alla fine.
+Col senno di poi, alcune scelte architetturali che ho fatto potrebbero essere migliorate:
+ad esempio rivedrei il modo in cui pagine e relativi controller vengono associati.
+Nel complesso però sono fiero della struttura che ho realizzato.
+Non credo che porterei avanti il progetto nel suo complesso, ma trovo che
+l'architettura possa avere del potenziale: mi piacerebbe rifinirla per utilizzarla
+in altre applicazioni personali.
+
+\section{Difficoltà incontrate e commenti per i docenti}
+\subsection{Emir Wanes Aouioua}
+Sono soddisfatto di come sia stato strutturato il corso di OOP ma presento una piccola critica
+legata ad una mia passata difficoltà: al giorno d'oggi sono fiero di poter dire di aver
+capito i design pattern che sono stati presentati a lezione e, dopo tanto allenamento personale,
+non saprei più come lavorare senza (soprattuto strategy, che ritengo uno dei più versatili);
+detto ciò, però, penso che durante il corso si dia davvero poco tempo a disposizione ad un
+argomento cosí importante e su cui verte cosí tanto la valutazione tra progetto ed esame pratico
+in laboratorio. Personalmente concederei almeno una lezione teorica ed una pratica
+aggiuntive al fine di far comprendere meglio gli OOP design pattern.
 
 \appendix
 \chapter{Guida utente}
@@ -459,5 +627,15 @@ Una volta che finisce la partita si verrà indirizzati al tabellone con la class
 \caption{Scermata della leaderboard.}
 \label{img:Leaderboard_Page}
 \end{figure}
+
+\chapter{Esercitazioni di laboratorio}
+\section{Emir Wanes Aouioua}
+\begin{itemize}
+	\item Laboratorio 07: \url{https://virtuale.unibo.it/mod/forum/discuss.php?d=177162#p245995}
+	\item Laboratorio 08: \url{https://virtuale.unibo.it/mod/forum/discuss.php?d=178723#p247237}
+	\item Laboratorio 09: \url{https://virtuale.unibo.it/mod/forum/discuss.php?d=179154#p247922}
+	\item Laboratorio 10: \url{https://virtuale.unibo.it/mod/forum/discuss.php?d=180101#p249324}
+	\item Laboratorio 11: \url{https://virtuale.unibo.it/mod/forum/discuss.php?d=181206#p250921}
+\end{itemize}
 
 \end{document}

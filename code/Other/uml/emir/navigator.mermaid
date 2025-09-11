@@ -1,0 +1,37 @@
+---
+config:
+  layout: elk
+  class:
+    hideEmptyMembersBox: true
+---
+classDiagram
+direction BT
+    class PageNavigator {
+	    +registerPage(id: PageId, page: Page)
+	    +navigateTo(id: PageId)
+	    +getCurrentPageId() Optional~PageId~
+    }
+    class PageId {
+    }
+    class Page {
+    }
+    class PageNavigatorImpl {
+    }
+    class PageController {
+    }
+    class Window {
+	    +setCurrentPage(page: Page)
+    }
+
+	<<interface>> PageNavigator
+	<<enumeration>> PageId
+	<<interface>> Page
+	<<abstract>> PageController
+	<<interface>> Window
+
+    PageNavigator ..> PageId
+    PageNavigator ..> "*" Page : navigates
+    PageNavigatorImpl ..|> PageNavigator
+    Window --o PageNavigatorImpl
+    PageNavigator --o PageController
+    Page "1" --o PageController

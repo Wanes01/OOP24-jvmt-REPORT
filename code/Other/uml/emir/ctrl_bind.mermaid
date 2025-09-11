@@ -1,0 +1,45 @@
+---
+config:
+  layout: dagre
+  class:
+    hideEmptyMembersBox: true
+---
+classDiagram
+direction BT
+    class ControllerAwarePage {
+	    +setController(ctrl: PageController)
+	    # ~~abstract~~ setHandlers()
+	    # getController(ctrlClass: Class~T~) ~T extends PageController~
+    }
+    class SwingPage {
+    }
+    class PageController {
+    }
+    class Page {
+    }
+    class SwingHomePage {
+	    +setHandlers()
+    }
+    class SwingSettingsPage {
+	    +setHandlers()
+    }
+    class SwingGameplayPage {
+	    +setHandlers()
+    }
+    class SwingLeaderboardPage {
+	    +setHandlers()
+    }
+
+	<<abstract>> ControllerAwarePage
+	<<abstract>> SwingPage
+	<<abstract>> PageController
+	<<interface>> Page
+
+    ControllerAwarePage --|> Page
+    SwingPage --|> ControllerAwarePage
+    SwingHomePage ..|> SwingPage
+    SwingSettingsPage ..|> SwingPage
+    SwingGameplayPage ..|> SwingPage
+    SwingLeaderboardPage ..|> SwingPage
+    PageController --o ControllerAwarePage
+    ControllerAwarePage --o PageController
