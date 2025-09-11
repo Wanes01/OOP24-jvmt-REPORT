@@ -116,25 +116,32 @@ al numero di gemme guadagnate dai giocatori.
 
 L'applicazione Javamant modella l'esplorazione di grotte,
 ognuna rappresentata da un round. Ogni partita coinvolge
-dei giocatori, che possono essere controllati da umani o
-dal software. Ogni round utilizza un mazzo di carte che
+da 3 a 8 giocatori, che possono essere controllati da umani o
+dal software. Ogni round utilizza un mazzo formato da più carte che
 progressivamente formeranno il percorso di esplorazione della grotta.
 Le carte pescate dal mazzo si dividono in più tipi: le carte tesoro forniscono
 gemme da distribuire equamente tra i giocatori, le carte trappola
 rappresentano pericoli che possono, se l'effetto del round lo permette, terminare il round e le carte
 reliquia danno gemme aggiuntive se un solo giocatore abbandona l'esplorazione
 alla fine di un turno.
-Un round si divide in turni successivi, ognuno composto da due fasi.
-Nella fase di estrazione il giocatore del turno pesca la carta che
-viene aggiunta al percorso dell'esplorazione. Nella fase di decisione
+In un round si giocano più turni, ognuno composto da due fasi:
+nella fase di estrazione il giocatore del turno pesca una carta che
+viene aggiunta al percorso dell'esplorazione del round. Nella fase di decisione
 i giocatori che esplorano la grotta scelgono se continuare l'esplorazione.
 Tutti i giocatori hanno una sacca temporanea per raccogliere le gemme durante un
 round ed un forziere per mantenere le proprie gemme tra un round e l'altro.
 Ad ogni round viene associato un effetto speciale che ne determina
-la condizione di fine e un eventuale modificatore applicato alle gemme.
+la condizione di fine e un modificatore applicato alle gemme.~\ref{img:model}
 
 % !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 % QUA C'E' DA METTERE L'UML ASTRATTISSIMO DEL DOMINIO.
+
+\begin{figure}[H]   % H maiuscola
+\centering
+\includegraphics[width=\textwidth]{img/model}
+\caption{Schema UML rappresentante il dominio di Javamant.}
+\label{img:model}
+\end{figure}
 
 \chapter{Design}
 
@@ -177,7 +184,8 @@ Le interazioni principali di questa architettura sono:
 L'architettura è stata progettata in modo da poter sostituire
 in modo semplice la view: per poter sostituire l'intera componente
 grafica è sufficiente dare nuove implementazioni di \textit{Window}
-e \textit{Page}, infatti i controller dipendono unicamente
+e \textit{Page} (o estensioni di \textit{ControllerAwarePage} per pagine interagibili),
+infatti i controller dipendono unicamente
 da queste interfacce ed il model non mantiene alcun riferimento
 ad elementi grafici.
 
@@ -185,7 +193,7 @@ Una versione schematizzata dell'architettura adoperata ~\ref{img:arch}:
 
 \begin{figure}[H]   % H maiuscola
 \centering
-\includegraphics[width=0.7\textwidth]{img/architecture}
+\includegraphics[width=\textwidth]{img/architecture}
 \caption{Schema UML architetturale di Javamant.}
 \label{img:arch}
 \end{figure}
@@ -242,7 +250,7 @@ Questa implementazione modulare rende l'aggiunta di nuove difficoltà e/o variab
 \paragraph{Soluzione}: Ho creato l'interfaccia \texttt{Game} che estende \texttt{Iterator<Round>}. In questo modo posso passare da un round ad un altro avendo a disposizione tutte le loro informazioni.
 
 \paragraph{Uso di pattern}: \texttt{Iterator}.
-
+\\
 \subsection{Emir Wanes Aouioua}
 \subsection*{Effetto speciale del round}
 \begin{description}
@@ -312,7 +320,7 @@ problema è l'utilizzo del pattern Decorator, il quale non viene utilizzato.
 	riutilizzabile ed è necessario crearne un altro. 
 \end{description}
 
-\subsection*{Lazy binding del controller nella view}
+\subsection*{Inizializzazione degli handler nelle pagine}
 \begin{description}
 	\item[\textbf{Problema}]: per via dell'architettura scelta, ogni \texttt{Page} che
 	necessita di interagibilità ha bisogno che venga associata ad uno specifico \texttt{PageController}; 

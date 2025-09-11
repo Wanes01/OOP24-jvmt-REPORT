@@ -1,0 +1,75 @@
+---
+config:
+  layout: elk
+  class:
+    hideEmptyMembersBox: true
+---
+classDiagram
+direction BT
+    class Game {
+	    +getNextRound() Round
+	    +currentRoundNumber() int
+	    +isGameOver() boolean
+    }
+    class Round {
+	    +getNextTurn() Turn
+	    +currentTurnNumber() int
+	    +getDrawnCards() List~Card~
+	    +getPathGems() int
+	    +addCardToPath(card: Card)
+	    +getDeck() Deck
+    }
+    class Turn {
+	    +getTurnPlayer() Player
+	    +getDrawnCard() Card
+	    +executeDrawPhase()
+	    +executeDecisionPhase()
+    }
+    class Player {
+	    +getName() String
+	    +getChestGems() int
+	    +getSackGems() int
+	    +getChoice() PlayerChoice
+	    +addSackGems(gems: int)
+	    +resetPlayer()
+	    +choose(choice: PlayerChoice)
+    }
+    class PlayerCpu {
+    }
+    class Deck {
+	    +drawCard() Card
+	    +isDeckEmpty() boolean
+	    +deckSize() int
+	    +shuffle()
+    }
+    class Card {
+	    +getName() String
+	    +getType() TypeCard
+    }
+    class TreasureCard {
+	    +getGems() int
+    }
+    class TrapCard {
+	    +getTrapType() String
+    }
+    class RelicCard {
+	    +getGems() int
+    }
+    class RoundEffect {
+	    +isRoundOver() boolean
+	    +modifyGems(gems: int) int
+    }
+
+    TrapCard --|> Card
+    RelicCard --|> Card
+    TreasureCard --|> Card
+    PlayerCpu --|> Player
+    Game *-- Round : <br>
+    Round *-- Turn : <br>
+    Round *-- Deck : <br>
+    Round *-- RoundEffect : <br>
+    Round *-- Card : <br>
+    Deck *-- Card : <br>
+    Round --> Player : <br>
+    Turn --> Player : <br>
+    Turn --> Card : <br>
