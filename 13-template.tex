@@ -12,6 +12,13 @@
 
 \usepackage[italian]{cleveref}
 
+%---------------
+\usepackage{comment}
+
+
+\newcommand{\imgpath}{img/png}
+%---------------
+
 %\title{Meta-relazione per\\``Programmazione ad Oggetti''}
 \title{Javamant \\ Relazione per il progetto del corso OOP}
 
@@ -273,7 +280,7 @@ Viene utilizzato il pattern \textit{Strategy} per incapsulare, in modo modulare
 Entrambi vengono creati tramite \textit{Factory Method} e accoppiati in un
 \texttt{RoundEffect}, usato dal Round senza conoscere i dettagli di come esso agisce ~\ref{img:effects}.
 
-\begin{figure}
+\begin{figure}[H]
   \makebox[\textwidth][c]{\includegraphics[width=1.1\textwidth]{img/effects}}%
   \caption{Il diagramma mostra come EndCondition e GemModifier rappresentino le stategie, creati
 dalle rispettive factory e composti in RoundEffectImpl. RoundImpl può utilizzare
@@ -399,6 +406,100 @@ problema è l'utilizzo del pattern Decorator, il quale non viene utilizzato.
 	(ad esempio, in futuro si potrebbe voler aggiungere pagine senza
 	struttura statica, create sul momento in base allo stato della partita).
 \end{description}
+%------
+\subsection{Andrea La Tosa}
+
+\subsubsection{GESTIONE DEL MAZZO}
+
+\paragraph{Problema:}
+La gestione del mazzo doveva consentire sia di pescare una nuova carta, sia di verificare se fossero ancora presenti carte disponibili.
+
+\paragraph{Soluzione:}
+È stata adottata l’implementazione del design pattern \textit{Iterator} che consente un accesso controllato e sequenziale alle carte del mazzo.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.4\textwidth]{Deck_Iterator.png}
+	\caption{Diagramma UML dell'utilizzo del design pattern \textit{Iterator}}
+	\label{fig:uml_deck:iterator}
+\end{figure}
+
+%--------------
+\subsubsection{CREAZIONE MODULARE DEI MAZZI:}
+
+\paragraph{Problema:}
+La creazione di mazzi modulari, composti da diversi tipi di carte e da configurazioni 
+predefinite, richiedeva una struttura flessibile, riusabile e facilmente estendibile.
+
+\paragraph{Soluzione:}
+L’adozione dei design pattern \textit{Builder} (in \texttt{DeckBuilderImpl}) e 
+\textit{Factory} (in \texttt{DeckFactoryImpl}) ha permesso rispettivamente la costruzione 
+modulare dei mazzi e la generazione di configurazioni predefinite in modo semplice e manutenibile.
+
+\paragraph{Vantaggi:}
+\begin{itemize}
+	\item  \textbf{manutenibilità:} ogni classe ha una responsabilità ridotta e ben definita.
+	\item  \textbf{estendibilità:} è semplice aggiungere nuove funzionalità o varianti di mazzi.
+	\item  \textbf{testing:} i test sono semplici da effettuare grazie alla separazione delle responsabilità.
+	\item \textbf{Riusabilità del codice:} la logica di costruzione e configurazione dei mazzi può essere riutilizzata
+per creare nuove varianti senza duplicazioni.
+\end{itemize}
+
+\paragraph{Svantaggi:}
+Lo svantaggio principale riguarda la maggiore complessità iniziale nella comprensione 
+della struttura del codice, dovuta all’introduzione di più classi e pattern.
+
+\paragraph{Possibile implementazione alternativa:}
+Una possibile alternativa consiste nella creazione di un'unica classe per la gestione del mazzo e delle sue statistiche avente, al suo interno,
+una classe innestata dedicata alla costruzione delle diverse tipologie di deck, contenente anche i metodi per l’aggiunta delle carte.
+Questa implementazione è stata scartata perchè risultava confusa, difficilmente manutenibile e violava il principio SRP (single responsibility principle)
+trasformandosi di fatto in una God Class.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{Builder_e_factory.png}
+	\caption{Diagramma UML dell'utilizzo dei design pattern \textit{Builder} e \textit{factory}}
+	\label{fig:uml_Builder_e_Factory}
+\end{figure}
+%-----------------------------
+
+\subsubsection{GESTIONE ESTENDIBILE DELLE CARTE}
+
+\paragraph{Problema:}
+Era necessario definire una struttura flessibile per rappresentare le carte.
+Questa doveva permettere di modellare facilmente le tre tipologie di carte attuali (reliquia, trappola e tesoro)
+e supportare, inoltre, l'aggiunta di nuove tipologie in futuro, senza modificare il codice esistente.
+
+\subsubsection{Soluzione:}
+E' stata progettata una gerarchia basata sulla classe \texttt{Card} contenente i comportamenti comuni a tutte le carte.
+Per rispettare il principio DRY (Don't Repeat Yourself) e mantenere una logica flessibile 
+è stata introdotta la classe \texttt{CardWithGem} che estende \texttt{Card} e aggiunge la logica relativa alla gestione
+delle gemme.
+In questo modo le tipologie di carte attuali (reliquia, trappola e tesoro) possono estendere \texttt{Card} o \texttt{CardWithGem}
+a seconda della presenza o meno di gemme associate alla carta e l'aggiunta di nuove tipologie di carte potrà essere effettuata
+senza modificare il codice prodotto.
+
+\paragraph{Vantaggi:}
+\begin{itemize}
+	\item \textbf{Estendibilità}: è possibile introdurre facilmente nuove tipologie di carte
+	senza modificare la struttura esistente.
+	\item \textbf{Riutilizzo del codice}: i comportamenti comuni sono centralizzati nella classe base di \texttt{Card}.
+\end{itemize}
+
+\paragraph{Svantaggi:}
+\begin{itemize}
+	\item \textbf{Rigidità della gerarchia:} ogni nuova tipologia di carta richiede 
+	la creazione di una sottoclasse dedicata.
+	\item \textbf{Impossibilità di combinare più effetti:} la struttura scelta non prevede 
+	che le carte possano combinare più effetti contemporaneamente.
+\end{itemize}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.9\textwidth]{UML_Card.png}
+	\caption{Diagramma UML della gerarchia delle carte}
+	\label{fig:uml_card_hierarchy}
+\end{figure}
 
 \chapter{Sviluppo}
 \section{Testing automatizzato}
@@ -409,10 +510,10 @@ ai test delle classi di dominio. Di sequito i test effettuati da ogni componente
 \begin{itemize}
  \item \textbf{Andrea La Tosa}:
 	\begin{itemize}
-	\item \texttt{DeckTest}:
-	\item \texttt{RelicCardTest}:
-	\item \texttt{TrapCardTest}:
-	\item \texttt{TreasureCardTest}:
+	\item \texttt{DeckTest}: verifica della corretta composizione del mazzo standard, inclusa l’estrazione delle carte.
+	\item \texttt{RelicCardTest}: verifica dei valori di gemme ammessi, del riscatto (\texttt{redeemCard()}) e stato (\texttt{isRedeemed()}) della carta.
+	\item \texttt{TrapCardTest}: verifica della correttezza dei percorsi delle immagini per ogni tipologia di trappola e del confronto tra carte.
+	\item \texttt{TreasureCardTest}: verifica dei valori di gemme validi, della correttezza dei percorsi immagine e del confronto tra carte tesoro.
 	\end{itemize}
  \item \textbf{Emir Wanes Aouioua}:
 	\begin{itemize}
@@ -481,8 +582,19 @@ Utilizzate frequentemente:
 	alla sequente domanda su StackOverflow. \footnote{Joel Carranza, font scalabile a prescindere dal DPI: \url{https://stackoverflow.com/questions/1102216/can-i-set-the-dpi-resolution-of-my-java-swing-application-without-changing-the-s}}
 	L'adattamento viene utilizzato nella classe \texttt{SwingWindow} per adattare la dimensione del font
 	per tutte le pagine Swing in base al DPI dello schermo utilizzato. 
-	
 \end{itemize}
+
+\subsection{Andrea La Tosa}
+
+\subsubsection{Utilizzo di generici:} \url{https://github.com/Wanes01/OOP24-jvmt/blob/bbeaba836d375717ec403006b1f065be8725656e/src/main/java/jvmt/view/page/utility/ComboboxWithLabel.java#L91C1-L96C6}
+
+\subsubsection{Utilizzo di stream e lambda:} \url{https://github.com/Wanes01/OOP24-jvmt/blob/ccdbae592c490476d3226350cbdbbeb99e32a596/src/main/java/jvmt/view/page/impl/SwingSettingsPage.java#L313C9-L318C10}
+
+\subsubsection{Utilizzo della dipendenza esterna MigLayout:}
+Utilizzato in vari punti, un esempio: \url{https://github.com/Wanes01/OOP24-jvmt/blob/ccdbae592c490476d3226350cbdbbeb99e32a596/src/main/java/jvmt/view/page/impl/SwingSettingsPage.java#L189C17-L192C50}
+
+\subsubsection{Utilizzo di consumer:} \url{https://github.com/Wanes01/OOP24-jvmt/blob/ccdbae592c490476d3226350cbdbbeb99e32a596/src/main/java/jvmt/controller/impl/SettingsControllerImpl.java#L93C1-L93C49}
+%------------------
 
 \chapter{Commenti finali}
 
@@ -513,6 +625,11 @@ Nel complesso però sono fiero della struttura che ho realizzato.
 Non credo che porterei avanti il progetto nel suo complesso, ma trovo che
 l'architettura possa avere del potenziale: mi piacerebbe rifinirla per utilizzarla
 in altre applicazioni personali.
+
+\subsection{Andrea La Tosa}
+Ho svolto la mia parte di progetto al meglio delle mie capacità e ritengo di aver dato un valido contributo al gruppo.
+Il progetto è stato svolto in un ambiente sereno e tranquillo il che ha reso molto facile scambiarsi idee e punti di vista, senza i quali avrei prodotto codice meno leggibile e manutenibile.
+Sono molto contento del codice che ho prodotto anche se devo ammettere che ho percepito molto la mia inesperienza in certi argomenti, primo fra tutti GitHub. 
 
 \section{Difficoltà incontrate e commenti per i docenti}
 \subsection{Emir Wanes Aouioua}

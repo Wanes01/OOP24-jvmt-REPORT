@@ -1,0 +1,41 @@
+---
+config:
+  class:
+    hideEmptyMembersBox: true
+---
+classDiagram
+direction TB
+    class Deck {
+	    <<Interface>>
+    }
+    class DeckBuilder {
+	    +build() Deck
+	    +addTrap(type : TypeTrapCard) DeckBuilder
+	    +addMultipleTrap(typeTrap : TypeTrapCard, numTrap : int) DeckBuilder
+	    +addTreasure(gemValue :  int) DeckBuilder
+	    +addMultipleTreasure(gemValue : int, numTreasure : int) DeckBuilder
+	    +addRelic() DeckBuilder
+	    +addMultipleRelic(numRelic : int) DeckBuilder
+	    +shuffle() DeckBuilder
+    }
+    class DeckBuilderImpl {
+
+    }
+
+    class DeckFactory {
+	    +standardDeck() Deck
+	    +specialDeck() Deck
+    }
+    class DeckFactoryImpl {
+
+    }
+
+	<<Interface>> Deck
+	<<Interface>> DeckBuilder
+	<<Interface>> DeckFactory
+
+    DeckBuilderImpl ..|> DeckBuilder
+    DeckFactoryImpl ..|> DeckFactory
+    DeckFactoryImpl ..> DeckBuilder : uses
+    DeckFactory ..> Deck : creates
+
