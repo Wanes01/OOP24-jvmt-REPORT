@@ -6,15 +6,7 @@ config:
 classDiagram
 direction TB
     class Deck {
-	    +numberOfRemainingCards() int
-	    +peekCard() Card
-	    +deckSize() int
-	    +totRelicCardsInDeck() int
-	    +totTreasureCardsInDeck() int
-	    +totTrapCardsInDeck() int
-	    +totTrapCardTypesInDeck() int
-	    +totSpecialCardInDeck() int
-	    +getShuffledCopy() Deck
+	    <<Interface>>
     }
     class DeckBuilder {
 	    +build() Deck
@@ -23,26 +15,27 @@ direction TB
 	    +addTreasure(gemValue :  int) DeckBuilder
 	    +addMultipleTreasure(gemValue : int, numTreasure : int) DeckBuilder
 	    +addRelic() DeckBuilder
-	    +addMultipleRelic(numRelic int) DeckBuilder
+	    +addMultipleRelic(numRelic : int) DeckBuilder
 	    +shuffle() DeckBuilder
     }
+    class DeckBuilderImpl {
+
+    }
+
     class DeckFactory {
 	    +standardDeck() Deck
 	    +specialDeck() Deck
     }
-    class Iterator~Card~{
-	    +hasNext() boolean
-	    +next() Card
-    }
-    class Card {
+    class DeckFactoryImpl {
+
     }
 
 	<<Interface>> Deck
 	<<Interface>> DeckBuilder
 	<<Interface>> DeckFactory
-	<<Interface>> Iterator
 
-    DeckFactory --> DeckBuilder : uses
-    DeckBuilder --> Deck : build() return
-    Deck --|> Iterator
-    Iterator~Card~ --> Card : uses
+    DeckBuilderImpl ..|> DeckBuilder
+    DeckFactoryImpl ..|> DeckFactory
+    DeckFactoryImpl ..> DeckBuilder : uses
+    DeckFactory ..> Deck : creates
+
