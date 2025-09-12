@@ -3,27 +3,13 @@ config:
   layout: elk
   class:
     hideEmptyMembersBox: true
+  theme: redux
+  look: neo
 ---
 classDiagram
-direction BT
-    class Game {
-	    +getNextRound() Round
-	    +currentRoundNumber() int
-	    +isGameOver() boolean
-    }
-    class Round {
-	    +getNextTurn() Turn
-	    +currentTurnNumber() int
-	    +getDrawnCards() List~Card~
-	    +getPathGems() int
-	    +addCardToPath(card: Card)
-	    +getDeck() Deck
-    }
-    class Turn {
-	    +getTurnPlayer() Player
-	    +getDrawnCard() Card
-	    +executeDrawPhase()
-	    +executeDecisionPhase()
+direction TB
+    class Card {
+	    +getName() String
     }
     class Player {
 	    +getName() String
@@ -36,29 +22,62 @@ direction BT
     }
     class PlayerCpu {
     }
+    class RoundEffect {
+	    +isRoundOver() boolean
+	    +modifyGems(gems: int) int
+    }
     class Deck {
 	    +drawCard() Card
 	    +isDeckEmpty() boolean
 	    +deckSize() int
 	    +shuffle()
     }
-    class Card {
-	    +getName() String
-	    +getType() TypeCard
-    }
-    class TreasureCard {
-	    +getGems() int
-    }
-    class TrapCard {
-	    +getTrapType() String
+    class Turn {
+	    +getTurnPlayer() Player
+	    +getDrawnCard() Card
+	    +executeDrawPhase()
+	    +executeDecisionPhase()
     }
     class RelicCard {
 	    +getGems() int
     }
-    class RoundEffect {
-	    +isRoundOver() boolean
-	    +modifyGems(gems: int) int
+    class TrapCard {
+	    +getTrapType() TypeTrapCard
     }
+    class TreasureCard {
+	    +getGems() int
+    }
+    class Round {
+	    +getNextTurn() Turn
+	    +currentTurnNumber() int
+	    +getDrawnCards() List~Card~
+	    +getPathGems() int
+	    +addCardToPath(card: Card)
+	    +getDeck() Deck
+    }
+    class Game {
+	    +getNextRound() Round
+	    +currentRoundNumber() int
+	    +isGameOver() boolean
+    }
+    class PlayerChoice {
+    }
+    class TypeTrapCard {
+    }
+
+	<<interface>> Card
+	<<interface>> Player
+	<<interface>> PlayerCpu
+	<<interface>> RoundEffect
+	<<interface>> Deck
+	<<interface>> Turn
+	<<interface>> RelicCard
+	<<interface>> TrapCard
+	<<interface>> TreasureCard
+	<<interface>> Round
+	<<interface>> Game
+	<<interface>> PlayerChoice
+	<<interface>> TypeTrapCard
 
     TrapCard --|> Card
     RelicCard --|> Card
@@ -73,3 +92,5 @@ direction BT
     Round --> Player : <br>
     Turn --> Player : <br>
     Turn --> Card : <br>
+    Player --> PlayerChoice : <br>
+    TrapCard --> TypeTrapCard : <br>

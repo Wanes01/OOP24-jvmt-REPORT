@@ -46,7 +46,7 @@ le quali possono essere di tre tipi:
 			La divisione delle gemme delle carte tesoro è equa tra i giocatori:
 			il resto della divisione rimane all'interno del percorso di esplorazione.
 	\item \textbf{Carte trappola}, 15 nel mazzo standard. Rappresentano ostacoli per i giocatori. Pescare due carte trappola
-	identiche fa terminare il round forzatamente e fa perdere tutte le gemme guadagnate nell'esplorazione
+	dello stesso tipo (ad esempio, due trappole lava o due trappole macigno) fa terminare il round forzatamente e fa perdere tutte le gemme guadagnate nell'esplorazione
 	della grotta ai giocatori che non hanno abbandonato quest'ultima.
 	\item \textbf{Carte reliquia}, 5 nel mazzo standard. Le reliquie hanno un valore in gemme e, a differenza delle carte tesoro,
 		il valore in gemme di quest'ultime non viene distribuito tra i giocatori: le gemme relative alle
@@ -120,10 +120,11 @@ da 3 a 8 giocatori, che possono essere controllati da umani o
 dal software. Ogni round utilizza un mazzo formato da più carte che
 progressivamente formeranno il percorso di esplorazione della grotta.
 Le carte pescate dal mazzo si dividono in più tipi: le carte tesoro forniscono
-gemme da distribuire equamente tra i giocatori, le carte trappola
-rappresentano pericoli che possono, se l'effetto del round lo permette, terminare il round e le carte
+gemme da distribuire equamente tra i giocatori, le carte
 reliquia danno gemme aggiuntive se un solo giocatore abbandona l'esplorazione
-alla fine di un turno.
+alla fine di un turno e le carte trappola, presenti in
+più tipologie,
+rappresentano pericoli che possono, se l'effetto del round lo decide, terminare il round.
 In un round si giocano più turni, ognuno composto da due fasi:
 nella fase di estrazione il giocatore del turno pesca una carta che
 viene aggiunta al percorso dell'esplorazione del round. Nella fase di decisione
@@ -131,17 +132,18 @@ i giocatori che esplorano la grotta scelgono se continuare l'esplorazione.
 Tutti i giocatori hanno una sacca temporanea per raccogliere le gemme durante un
 round ed un forziere per mantenere le proprie gemme tra un round e l'altro.
 Ad ogni round viene associato un effetto speciale che ne determina
-la condizione di fine e un modificatore applicato alle gemme.~\ref{img:model}
+la condizione di fine e un modificatore applicato alle gemme.~\ref{img:domain}
 
 % !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 % QUA C'E' DA METTERE L'UML ASTRATTISSIMO DEL DOMINIO.
 
-\begin{figure}[H]   % H maiuscola
-\centering
-\includegraphics[width=\textwidth]{img/model}
-\caption{Schema UML rappresentante il dominio di Javamant.}
-\label{img:model}
+\begin{figure}
+  \makebox[\textwidth][c]{\includegraphics[width=1.3\textwidth]{img/domain}}%
+  \caption{Schema UML rappresentante il dominio di Javamant.}
+  \label{img:domain}
 \end{figure}
+
+
 
 \chapter{Design}
 
@@ -271,13 +273,12 @@ Viene utilizzato il pattern \textit{Strategy} per incapsulare, in modo modulare
 Entrambi vengono creati tramite \textit{Factory Method} e accoppiati in un
 \texttt{RoundEffect}, usato dal Round senza conoscere i dettagli di come esso agisce ~\ref{img:effects}.
 
-\begin{figure}[H]   % H maiuscola
-\centering
-\includegraphics[width=\textwidth]{img/effects}
-\caption{Il diagramma mostra come EndCondition e GemModifier rappresentino le stategie, creati
+\begin{figure}
+  \makebox[\textwidth][c]{\includegraphics[width=1.1\textwidth]{img/effects}}%
+  \caption{Il diagramma mostra come EndCondition e GemModifier rappresentino le stategie, creati
 dalle rispettive factory e composti in RoundEffectImpl. RoundImpl può utilizzare
 le due strategie in modo completamente interscambiabile.}
-\label{img:effects}
+  \label{img:effects}
 \end{figure}
 
 \item[\textbf{Pro}]:
@@ -339,7 +340,7 @@ problema è l'utilizzo del pattern Decorator, il quale non viene utilizzato.
 
 	\begin{figure}[H]   % H maiuscola
 	\centering
-	\includegraphics[width=0.85\textwidth]{img/ctrl_bind}
+	\includegraphics[width=\textwidth]{img/ctrl_bind}
 	\caption{Il diagramma mostra il pattern Template Method applicato a ControllerAwarePage, in cui
 	il metodo \texttt{setController(PageController)} fa da metodo template e \texttt{setHandlers()} da hook.
 	Nota: il metodo getController(class) viene utilizzato per evitare la propagazione dei generici a tutto
@@ -379,7 +380,7 @@ problema è l'utilizzo del pattern Decorator, il quale non viene utilizzato.
 
 	\begin{figure}[H]   % H maiuscola
 	\centering
-	\includegraphics[width=0.4\textwidth]{img/navigator}
+	\includegraphics[width=0.5\textwidth]{img/navigator}
 	\caption{Il diagramma mostra come PageController gestisca una singola pagina
 	e come PageNavigator coordini la navigazione verso altre pagine.}
 	\label{img:navigator}
