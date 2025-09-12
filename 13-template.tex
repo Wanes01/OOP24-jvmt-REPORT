@@ -13,6 +13,9 @@
 \usepackage[italian]{cleveref}
 
 %---------------
+\usepackage{comment}
+
+
 \newcommand{\imgpath}{img/png}
 %---------------
 
@@ -242,138 +245,112 @@ Una versione schematizzata dell'architettura adoperata ~\ref{img:arch}:
 
 %------
 \subsection{Andrea La Tosa}
-\subsubsection{Refactoring classe DeckImpl:}
+
+\subsubsection{GESTIONE DEL MAZZO}
 
 \paragraph{Problema:}
+La gestione del mazzo doveva consentire sia di pescare una nuova carta, sia di verificare se fossero ancora presenti carte disponibili.
 
-Durante lo sviluppo del progetto la classe DeckImpl (responsabile della gestione del mazzo di carte) stava mostrando i seguenti problemi architetturali:
-\begin{itemize}
-	\item era diventata una classe molto grande con molti metodi, difficile da manutenere ed estendere,
-	\item  violava SRP(single responsibility principle),
-	\item  era diventata una vera e propria God class accentrando dentro di sè troppe responsabilità.
-\end{itemize}
-%
-DeckImpl aveva una classe annidata che aveva lo scopo di:
-\begin{itemize}
-	\item  calcolare le statistiche del mazzo(es. il numero di carte trappola, il numero totale di carte nel mazzo etc..) 
-	restituendole alla classe contenitore che a sua volta le avrebbe restituite verso l'esterno 
-	(logica poco intuitiva e ridondante),
-	\item  creare i vari tipi di mazzo (standard e special),
-	\item  includere i metodi per aggiungere le carte al mazzo.
-\end{itemize}
-%
-Questa implementazione risultava quindi confusionaria e difficilmente manutenibile.
-
-\paragraph{Refactoring effettuato:}
-
-Per risolvere queste problematiche è stato effettuato un refactoring strutturale che ha portato la divisione della classe originaria 
-in classi piu' semplici e con responsabiltà singole e ben definite adottando tre noti design pattern: Iterator, Builder e Factory.
-Il refactoring ha portato alla definizione delle seguenti classi:
-\begin{itemize}
-	\item  DeckImpl: gestisce la logica del mazzo come le statistiche, il mescolamento e l'estrazione delle carte.
-	Per quest'ultima funzionalità l'interfaccia della classe estende Iterator$<$Card$>$.
-	\item  DeckBuilderImpl: applica il pattern Builder per aggiungere al mazzo i vari tipi di carte e infine,medinate il metodo build(), creare un oggetto Deck.
-	\item  DeckFactoryImpl: applica il pattern Factory per la creazione di mazzi predefiniti (es. mazzo standard) sfruttando i metodi forniti da DeckBuilderImpl.
-\end{itemize}
-
-\paragraph{Benefici ottenuti dopo il refactoring:}
-
-\begin{itemize}
-	\item  manutenibilità: ogni classe ha una responsabilità piu' piccola e ben definita.
-	\item  estendibilità: è molto piu' semplice aggiungere nuove funzionalità e configurazioni di mazzi.
-	\item  testing: i test sono piu' semplici da effettuare non avendo piu' una God class.
-\end{itemize}
-%
-\paragraph{Problematiche ottenute dopo il refactoring:}
-
-\begin{itemize}
-	\item  piu' interfacce e classi da gestire
-	\item  la comprensione del codice potrebbe risultare inizialmente piu' complessa.
-\end{itemize}
+\paragraph{Soluzione:}
+È stata adottata l’implementazione del design pattern \textit{Iterator} che consente un accesso controllato e sequenziale alle carte del mazzo.
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[height=0.9\textheight]{\imgpath/UML_Deck2.png}
-	\caption{Diagramma UML dopo il refactoring della classe DeckImpl con l'utilizzo dei pattern Iterator, Builder e Factory}
-	\label{fig:uml_deck_refactoring}
+	\includegraphics[width=0.4\textwidth]{Deck_Iterator.png}
+	\caption{Diagramma UML dell'utilizzo del design pattern \textit{Iterator}}
+	\label{fig:uml_deck:iterator}
 \end{figure}
 
-
-\subsubsection{GERARCHIA DELLE CARTE:}
+%--------------
+\subsubsection{CREAZIONE MODULARE DEI MAZZI:}
 
 \paragraph{Problema:}
+La creazione di mazzi modulari, composti da diversi tipi di carte e da configurazioni 
+predefinite, richiedeva una struttura flessibile, riusabile e facilmente estendibile.
 
-il gioco, come definito nella fase di analisi, prevede l'utilizzo di 4 tipologie di carte:
+\paragraph{Soluzione:}
+L’adozione dei design pattern \textit{Builder} (in \texttt{DeckBuilderImpl}) e 
+\textit{Factory} (in \texttt{DeckFactoryImpl}) ha permesso rispettivamente la costruzione 
+modulare dei mazzi e la generazione di configurazioni predefinite in modo semplice e manutenibile.
+
+\paragraph{Vantaggi:}
 \begin{itemize}
-	\item \textbf{Trappola:}
-	non hanno valore in gemme.
-	Vengono utilizzate per alcune condizioni di fine round.
-
-	\item \textbf{Tesoro:}
-	hanno un valore associato in gemme.
-
-	\item \textbf{Reliquia:}
-	hanno un valore associato in gemme estratto da una sequenza di possibili valori.
-	
-	\item \textbf{Speciale} (non ancora implementate):
-	sono state pensate per aggiungere effetti particolari e dinamicità al gioco come ad esempio far perdere delle gemme dalla sacca di un giocatore.
-	Possono avere o meno un valore in gemme.
+	\item  \textbf{manutenibilità:} ogni classe ha una responsabilità ridotta e ben definita.
+	\item  \textbf{estendibilità:} è semplice aggiungere nuove funzionalità o varianti di mazzi.
+	\item  \textbf{testing:} i test sono semplici da effettuare grazie alla separazione delle responsabilità.
+	\item \textbf{Riusabilità del codice:} la logica di costruzione e configurazione dei mazzi può essere riutilizzata
+per creare nuove varianti senza duplicazioni.
 \end{itemize}
-Il design di progettazione doveva tener conto:
-\begin{itemize}
-	\item delle 3 tipologie di carte effettivamente implementate,
 
-	\item della possibilità di estendere il gioco con le carte speciali.
-\end{itemize}
-La soluzione iniziale non permetteva nè di modellare in modo efficace la differenza tra carta tesoro e reliquia nè una facile estensione per le carte speciali.
+\paragraph{Svantaggi:}
+Lo svantaggio principale riguarda la maggiore complessità iniziale nella comprensione 
+della struttura del codice, dovuta all’introduzione di più classi e pattern.
 
-\subsection*{Soluzione iniziale:}
-
-Il  primo approccio prevedeva una gerarchia con la seguente struttura:
-\begin{itemize}
-	\item Card:
-	la classe principale che definisce i comportamenti comuni a tutte le carte.
-	\item TreasureCard, RelicCard, TrapCard:
-	le classi che estendono Card e definiscono i comportamenti specifici delle rispettive carte.
-\end{itemize}
-%
-Tuttavia, in questo tipo di gerarchia era evidente la duplicazione della logica tra il comportamento delle carte reliquia e reperto.
-L'unica differenza era il come veniva generato il numero di gemme da associare alla carta:
-internamente per le carte reliquia e richiesto in input per le carte tesoro.
-\\\\
-Questa struttura non solo violava il principio DRY(Don't Repeat Yourself) ma rendeva la gerarchia poco estendibile.
-
-\paragraph{Refactoring effettuato:}
-
-Per risolvere il problema è stata aggiunta la classe intermedia CardWithGem.
-Questa descrive il comportamento generico delle carte (estendendo Card) ma aggiunge la logica delle gemme.
-Le classi RelicCard e TreasureCard estendono ora CardWithGem evitando la duplicazione di logica e codice.
+\paragraph{Possibile implementazione alternativa:}
+Una possibile alternativa consiste nella creazione di un'unica classe per la gestione del mazzo e delle sue statistiche avente, al suo interno,
+una classe innestata dedicata alla costruzione delle diverse tipologie di deck, contenente anche i metodi per l’aggiunta delle carte.
+Questa implementazione è stata scartata perchè risultava confusa, difficilmente manutenibile e violava il principio SRP (single responsibility principle)
+trasformandosi di fatto in una God Class.
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.8\textwidth]{\imgpath/UML_Card.png}
-	\caption{Diagramma UML della gerarchia delle carte dopo l'introduzione della classe intermedia CardWithGem}
+	\includegraphics[width=\textwidth]{Builder_e_factory.png}
+	\caption{Diagramma UML dell'utilizzo dei design pattern \textit{Builder} e \textit{factory}}
+	\label{fig:uml_Builder_e_Factory}
+\end{figure}
+%-----------------------------
+
+\subsubsection{GESTIONE ESTENDIBILE DELL CARTE}
+
+\paragraph{Problema:}
+Era necessario definire una struttura flessibile per rappresentare le carte.
+Questa doveva permettere di modellare facilmente le tre tipologie di carte attuali (reliquia, trappola e tesoro)
+e supportare, inoltre, l'aggiunta di nuove tipologie in futuro, senza modificare il codice esistente.
+
+\subsubsection{Soluzione:}
+E' stata progettata una gerarchia basata sulla classe \texttt{Card} contenente i comportamenti comuni a tutte le carte.
+Per rispettare il principio DRY (Don't Repeat Yourself) e mantenere una logica flessibile 
+è stata introdotta la classe \texttt{CardWithGem} che estende \texttt{Card} e aggiunge la logica relativa alla gestione
+delle gemme.
+In questo modo le tipologie di carte attuali (reliquia, trappola e tesoro) possono estendere \texttt{Card} o \texttt{CardWithGem}
+a seconda della presenza o meno di gemme associate alla carta e l'aggiunta di nuove tipologie di carte potrà essere effettuata
+senza modificare il codice prodotto.
+
+\paragraph{Vantaggi:}
+\begin{itemize}
+	\item \textbf{Estendibilità}: è possibile introdurre facilmente nuove tipologie di carte
+	senza modificare la struttura esistente.
+	\item \textbf{Riutilizzo del codice}: i comportamenti comuni sono centralizzati nella classe base di \texttt{Card}.
+\end{itemize}
+
+\paragraph{Svantaggi:}
+\begin{itemize}
+	\item \textbf{Rigidità della gerarchia:} ogni nuova tipologia di carta richiede 
+	la creazione di una sottoclasse dedicata.
+	\item \textbf{Impossibilità di combinare più effetti:} la struttura scelta non prevede 
+	che le carte combinino più effetti contemporaneamente.
+	Per risolvere questa limitazione si potrebbe applicare il design pattern \textit{Decorator}.
+\end{itemize}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.9\textwidth]{UML_Card.png}
+	\caption{Diagramma UML della gerarchia delle carte}
 	\label{fig:uml_card_hierarchy}
 \end{figure}
 
-\noindent Questo refactoring ha anche anticipato l'aggiunta delle carte speciali in quanto:
-\begin{itemize}
-	\item se hanno delle gemme potranno estendere CardWithGem
-	\item se non hanno delle gemme potranno estendere Card
-\end{itemize}
-
+%---------------
 \chapter{Sviluppo}
 \section{Testing automatizzato}
 
-%-----------
 Il testing automatizzato è stato effettuato con Junit, di seguito i vari test divisi per sezioni:
 \begin{itemize}
  \item Card:
     \begin{itemize}
-    \item DeckTest: i test sono stati effettuati sulla configurazione standard del deck, comprendono la corretta composizione del mazzo e l'estrazione delle carte.
-	\item TrapCardTest: testing riguardante il comportamento comune delle carte.
-	\item RelicCardTest: oltre ai test sui metodi comuni delle carte è stato verificato anche il riscatto, lo stato relativo e i valori di gemme possibili.
-	\item TreasureCardTest: oltre ai test sui metodi comuni delle carte sono stati verificati i valori di gemme ammessi.
+    \item DeckTest: verifica della corretta composizione del mazzo standard, inclusa l’estrazione delle carte.
+	\item TrapCardTest: verifica della correttezza dei percorsi delle immagini per ogni tipologia di trappola e del confronto tra carte.
+	\item RelicCardTest: verifica dei valori di gemme ammessi, del riscatto (\texttt{redeemCard()}) e stato (\texttt{isRedeemed()}) della carta.
+	\item TreasureCardTest: verifica dei valori di gemme validi, della correttezza dei percorsi immagine e del confronto tra carte tesoro.
     \end{itemize}
  \item Round:
     \begin{itemize}

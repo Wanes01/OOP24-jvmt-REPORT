@@ -1,0 +1,21 @@
+---
+config:
+  class:
+    hideEmptyMembersBox: true
+---
+classDiagram
+direction TB
+    class Deck {
+    }
+    class Iterator~Card~ {
+	    +hasNext() boolean
+	    +next() Card
+    }
+    class Card {
+    }
+
+	<<Interface>> Deck
+	<<Interface>> Iterator
+
+    Deck --|> Iterator
+    Iterator ..> Card : uses

@@ -11,19 +11,19 @@ direction TB
     class TypeTrapCard {
     }
     class Card {
-	    +String getName()
-	    +TypeCard getType()
-	    +URL getImagePath()
+	    +getName() String
+	    +getType() TypeCard
+	    +getImagePath() URL
     }
     class CardWithGem {
-	    +int getGemValue()
+	    + getGemValue() int
     }
     class RelicCard {
-	    +boolean isRedeemed()
-	    +void redeemCard()
+	    +isRedeemed() boolean
+	    +redeemCard() void
     }
     class TrapCard {
-	    +TypeTrapCard getTypeTrap()
+	    +getTypeTrap() TypeTrapCard
     }
     class TreasureCard {
     }
@@ -31,9 +31,10 @@ direction TB
 	<<enumeration>> TypeCard
 	<<enumeration>> TypeTrapCard
 
-    Card -- TypeCard : uses
+    Card ..> TypeCard : uses
     Card <|-- CardWithGem
     CardWithGem <|-- RelicCard
     Card <|-- TrapCard
-    TrapCard -- TypeTrapCard : uses
+    TrapCard ..> TypeTrapCard : uses
     CardWithGem <|-- TreasureCard
+
